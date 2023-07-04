@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)https://www.cnblogs.com/r1cardo/p/16029601.html -->
+<html lang="zh-cn" style="--olcb-folder-code-block-max-height: 80vh; --cnb-code-bg: rgb(245, 245, 245); --cnb-code-font-size: 12px; --cnb-code-color: rgb(68, 68, 68);"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin-when-cross-origin">
+    <meta name="description" content="Flutter Stream的使用 ##首先，来了解一下stream是什么 异步数据事件的来源。 流提供了一种接收一系列事件的方法。每个事件要么是一个数据事件，也称为流的元素，要么是一个错误 事件，即某事已失败的通知。当流发出所有事件时，单个“完成”事件将通知监听器已达到结束。 您通过调用异步函数生">
+    <meta property="og:description" content="Flutter Stream的使用 ##首先，来了解一下stream是什么 异步数据事件的来源。 流提供了一种接收一系列事件的方法。每个事件要么是一个数据事件，也称为流的元素，要么是一个错误 事件，即某事已失败的通知。当流发出所有事件时，单个“完成”事件将通知监听器已达到结束。 您通过调用异步函数生">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>(oﾟvﾟ)ノ Hi - Flutter Stream的使用</title>
+    <link id="favicon" rel="shortcut icon" href="https://www.cnblogs.com/r1cardo/p/16029601.html" type="image/svg+xml">
+    
+    <style>#home :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs), :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs) {background: rgb(245, 245, 245);
+        padding: 12px;
+        border: 0.909091px solid rgb(204, 204, 204);
+        border-radius: 3px;
+        border-color: transparent;
+        color: rgb(68, 68, 68);
+        font-family: "Cascadia Code-SemiLight", "Courier New", sans-serif, Consolas, Monaco;
+        font-size: 12px</style><link rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/blog-common.min.css">
+    
+
+    
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/cnblogs.css">
+    <link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/custom.css">
+    <link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/CascadiaCode-SemiLight.min.css">
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/bundle-simplememory-mobile-pure.min.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/r1cardo/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/r1cardo/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/r1cardo/wlwmanifest.xml">
+    <script type="text/javascript" async="" src="./Flutter Stream的使用 - R1cardo - 博客园_files/analytics.js.下载"></script><script async="" src="./Flutter Stream的使用 - R1cardo - 博客园_files/f.txt"></script><script>
+        var currentBlogId = 678901;
+        var currentBlogApp = 'r1cardo';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'SimpleMemory';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        try {
+            if (hasCustomScript && document.referrer && document.referrer.indexOf('baidu.com') >= 0) {
+                Object.defineProperty(document, 'referrer', { value: '' });
+                Object.defineProperty(Document.prototype, 'referrer', { get: function () { return ''; } });
+            }
+        } catch (error) { }
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'androidstudio';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+        window.enableMacStyleCodeBlock = false
+    </script>
+        <script>
+            var currentPostDateAdded = '2022-03-20 12:44';
+        </script>
+    <script src="./Flutter Stream的使用 - R1cardo - 博客园_files/jquery-2.2.0.min.js.下载"></script>
+    <script src="./Flutter Stream的使用 - R1cardo - 博客园_files/blog-common.min.js.下载"></script><style>.medium-zoom-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 300ms;
+  will-change: opacity;
+}
+
+.medium-zoom--opened .medium-zoom-overlay {
+  cursor: pointer;
+  cursor: zoom-out;
+  opacity: 1;
+}
+
+.medium-zoom-image {
+  cursor: pointer;
+  cursor: zoom-in;
+  /*
+    The `transition` is marked as "!important" for the animation to happen
+    even though it's overriden by another inline `transition` style attribute.
+
+    This is problematic with frameworks that generate inline styles on their
+    images (e.g. Gatsby).
+
+    See https://github.com/francoischalifour/medium-zoom/issues/110
+   */
+  transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) !important;
+}
+
+.medium-zoom-image--hidden {
+  visibility: hidden;
+}
+
+.medium-zoom-image--opened {
+  position: relative;
+  cursor: pointer;
+  cursor: zoom-out;
+  will-change: transform;
+}
+</style><script id="hljs-script" src="./Flutter Stream的使用 - R1cardo - 博客园_files/highlight.min.js.下载" type="text/javascript" async=""></script>
+    
+
+    
+<style type="text/css">#_copy{align-items:center;background:#4494d5;border-radius:3px;color:#fff;cursor:pointer;display:flex;font-size:13px;height:30px;justify-content:center;position:absolute;width:60px;z-index:1000}#select-tooltip,#sfModal,.modal-backdrop,div[id^=reader-helper]{display:none!important}.modal-open{overflow:auto!important}._sf_adjust_body{padding-right:0!important}.super_copy_btns_div{position:fixed;width:154px;left:10px;top:45%;background:#e7f1ff;border:2px solid #4595d5;font-weight:600;border-radius:2px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Helvetica Neue,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;z-index:5000}.super_copy_btns_logo{width:100%;background:#4595d5;text-align:center;font-size:12px;color:#e7f1ff;line-height:30px;height:30px}.super_copy_btns_btn{display:block;width:128px;height:28px;background:#7f5711;border-radius:4px;color:#fff;font-size:12px;border:0;outline:0;margin:8px auto;font-weight:700;cursor:pointer;opacity:.9}.super_copy_btns_btn:hover{opacity:.8}.super_copy_btns_btn:active{opacity:1}</style><style type="text/css">.heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: absolute;}.heart:after{top: -5px;}.heart:before{left: -5px;}</style><script src="./Flutter Stream的使用 - R1cardo - 博客园_files/jquery.mousewheel.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="snapSvg" src="./Flutter Stream的使用 - R1cardo - 博客园_files/snap.svg-min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="tools" src="./Flutter Stream的使用 - R1cardo - 博客园_files/tools.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="src/script/lib/css.min" src="./Flutter Stream的使用 - R1cardo - 博客园_files/css.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="classie" src="./Flutter Stream的使用 - R1cardo - 博客园_files/classie.min.js.下载"></script><link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/optiscroll.min.css"><link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/menu_bubble.min.css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="optiscroll_ToProgress_rotate" src="./Flutter Stream的使用 - R1cardo - 博客园_files/optiscroll_ToProgress_rotate.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="main4" src="./Flutter Stream的使用 - R1cardo - 博客园_files/main4.min.js.下载"></script><link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/font_543384_kv876ayucyc.css"><link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/google-fonts.min.css"><meta http-equiv="origin-trial" content="A7CQXglZzTrThjGTBEn1rWTxHOEtkWivwzgea+NjyardrwlieSjVuyG44PkYgIPGs8Q9svD8sF3Yedn0BBBjXAkAAACFeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjk1MTY3OTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A3vKT9yxRPjmXN3DpIiz58f5JykcWHjUo/W7hvmtjgh9jPpQgem9VbADiNovG8NkO6mRmk70Kex8/KUqAYWVWAEAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjk1MTY3OTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A4A26Ymj79UVY7C7JGUS4BG1s7MdcDokAQf/RP0paks+RoTYbXHxceT/5L4iKcsleFCngi75YfNRGW2+SpVv1ggAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjk1MTY3OTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="As0hBNJ8h++fNYlkq8cTye2qDLyom8NddByiVytXGGD0YVE+2CEuTCpqXMDxdhOMILKoaiaYifwEvCRlJ/9GcQ8AAAB8eyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3MTk1MzI3OTksImlzU3ViZG9tYWluIjp0cnVlfQ=="><meta http-equiv="origin-trial" content="AgRYsXo24ypxC89CJanC+JgEmraCCBebKl8ZmG7Tj5oJNx0cmH0NtNRZs3NB5ubhpbX/bIt7l2zJOSyO64NGmwMAAACCeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiV2ViVmlld1hSZXF1ZXN0ZWRXaXRoRGVwcmVjYXRpb24iLCJleHBpcnkiOjE3MTk1MzI3OTksImlzU3ViZG9tYWluIjp0cnVlfQ=="><script src="./Flutter Stream的使用 - R1cardo - 博客园_files/f(1).txt" async=""></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="base" src="./Flutter Stream的使用 - R1cardo - 博客园_files/base.min.js.下载"></script><link href="./Flutter Stream的使用 - R1cardo - 博客园_files/jquery.mCustomScrollbar.min.css" rel="stylesheet" type="text/css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="TweenMax_MyTween" src="./Flutter Stream的使用 - R1cardo - 博客园_files/TweenMax_MyTween.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="clipboard" src="./Flutter Stream的使用 - R1cardo - 博客园_files/clipboard.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="articleStatement" src="./Flutter Stream的使用 - R1cardo - 博客园_files/articleStatement.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="RibbonsEffect" src="./Flutter Stream的使用 - R1cardo - 博客园_files/RibbonsEffect.min.js.下载"></script><link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/jquery.fancybox.min.css"><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="title" src="./Flutter Stream的使用 - R1cardo - 博客园_files/articleTitle.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="bootstrap" src="./Flutter Stream的使用 - R1cardo - 博客园_files/bootstrap.min.js.下载"></script><link type="text/css" rel="stylesheet" href="./Flutter Stream的使用 - R1cardo - 博客园_files/marvin.nav2.min.css"><link rel="preload" href="./Flutter Stream的使用 - R1cardo - 博客园_files/f(2).txt" as="script"><script type="text/javascript" src="./Flutter Stream的使用 - R1cardo - 博客园_files/f(2).txt"></script><script esp-signal="true" src="./Flutter Stream的使用 - R1cardo - 博客园_files/pubcid.min.js.下载"></script><script esp-signal="true" src="https://oa.openxcdn.net/esp.js"></script><script esp-signal="true" src="./Flutter Stream的使用 - R1cardo - 博客园_files/esp.js.下载"></script><script esp-signal="true" src="./Flutter Stream的使用 - R1cardo - 博客园_files/publishertag.ids.js.下载"></script><script esp-signal="true" src="./Flutter Stream的使用 - R1cardo - 博客园_files/sync.min.js.下载"></script><script esp-signal="true" src="./Flutter Stream的使用 - R1cardo - 博客园_files/uid2SecureSignal.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="fancybox" src="./Flutter Stream的使用 - R1cardo - 博客园_files/jquery.fancybox.min.js.下载"></script><script type="text/javascript" charset="utf-8" async="" data-requirecontext="_" data-requiremodule="marvin" src="./Flutter Stream的使用 - R1cardo - 博客园_files/marvin.nav2.min.js.下载"></script><meta http-equiv="origin-trial" content="A/vXSuiuvzsL+Db89QNS/YzqK5Wmzx9oASGHZVMjcaWfVdbB6eUJrJGNr7uhrsmiGhryVjVALd72agYzELDTMAgAAACAeyJvcmlnaW4iOiJodHRwczovL2NyaXRlby5uZXQ6NDQzIiwiZmVhdHVyZSI6IlByaXZhY3lTYW5kYm94QWRzQVBJcyIsImV4cGlyeSI6MTY2OTc2NjM5OSwiaXNTdWJkb21haW4iOnRydWUsImlzVGhpcmRQYXJ0eSI6dHJ1ZX0="><meta http-equiv="origin-trial" content="A0KGawWMfAygakxUO+Z3rulPwK2j0AqkLneiEt4pAI951GYaafeHNV9Ya+PAn7s0y12QSrfTjc9LdOUU+QfkdQwAAACAeyJvcmlnaW4iOiJodHRwczovL2NyaXRlby5jb206NDQzIiwiZmVhdHVyZSI6IlByaXZhY3lTYW5kYm94QWRzQVBJcyIsImV4cGlyeSI6MTY2OTc2NjM5OSwiaXNTdWJkb21haW4iOnRydWUsImlzVGhpcmRQYXJ0eSI6dHJ1ZX0="></head>
+<body class="skin-simplememory no-navbar hljs-engine" style="overflow: auto;" _c_t_j1="1"><div id="dayNightSwitch" class="generalWrapper">    <div class="onOff daySwitch">        <div class="star star1"></div>        <div class="star star2"></div>        <div class="star star3"></div>        <div class="star star4"></div>        <div class="star star5"></div>        <div class="star sky"></div>        <div class="sunMoon">            <div class="crater crater1"></div>            <div class="crater crater2"></div>            <div class="crater crater3"></div>            <div class="cloud part1"></div>            <div class="cloud part2"></div>        </div>    </div></div>
+    <a name="top" style="display: none;"></a>
+    <div id="top_nav" class="navbar forpc navbar-custom">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding">
+                    <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                        <img src="./Flutter Stream的使用 - R1cardo - 博客园_files/logo.svg" alt="博客园Logo">
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.cnblogs.com/" onclick="countClicks(&#39;skin-navbar-sitehome&#39;)">首页</a>
+                </li>
+                <li>
+                    <a href="https://news.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-news&#39;)">新闻</a>
+                </li>
+                <li>
+                    <a href="https://q.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-q&#39;)">博问</a>
+                </li>
+                    <li><a href="https://www.cnblogs.com/cmt/p/17510065.html">直播</a></li>
+                <li>
+                    <a href="https://ing.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-ing&#39;)">闪存</a>
+                </li>
+                <li>
+                    <a href="https://edu.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-edu&#39;)">班级</a>
+                </li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search dropdown" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3" autocomplete="off">
+                        <button id="zzk_search_button" onclick="window.navbarSearchManager.triggerActiveOption()">
+                            <img id="search_icon" class="focus-hidden" src="./Flutter Stream的使用 - R1cardo - 博客园_files/search.svg" alt="搜索">
+                            <img class="hidden focus-visible" src="./Flutter Stream的使用 - R1cardo - 博客园_files/enter.svg" alt="搜索">
+                        </button>
+                        <ul id="navbar_search_options" class="dropdown-menu quick-search-menu">
+                            <li tabindex="0" class="active" onclick="zzkSearch(event, document.getElementById(&#39;zzk_search_input&#39;).value)">
+                                <div class="keyword-wrapper">
+                                    <img src="./Flutter Stream的使用 - R1cardo - 博客园_files/search.svg" alt="搜索">
+                                    <div class="keyword"></div>
+                                </div>
+                                <span class="search-area">所有博客</span>
+                            </li>
+                                    <li tabindex="1" onclick="zzkBlogSearch(event, &#39;r1cardo&#39;, document.getElementById(&#39;zzk_search_input&#39;).value)">
+                                        <div class="keyword-wrapper">
+                                            <img src="./Flutter Stream的使用 - R1cardo - 博客园_files/search.svg" alt="搜索">
+                                            <div class="keyword"></div>
+                                        </div>
+                                        <span class="search-area">当前博客</span>
+                                    </li>
+                        </ul>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔" style="display: none;">
+                        <img id="new_post_icon" class="navbar-icon" src="./Flutter Stream的使用 - R1cardo - 博客园_files/newpost.svg" alt="写随笔">
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客" style="display: none;">
+                        <img id="myblog_icon" class="navbar-icon" src="./Flutter Stream的使用 - R1cardo - 博客园_files/myblog.svg" alt="我的博客">
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息" style="display: none;">
+                        <img id="msg_icon" class="navbar-icon" src="./Flutter Stream的使用 - R1cardo - 博客园_files/message.svg" alt="短消息">
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                        <img class="navbar-icon" src="./Flutter Stream的使用 - R1cardo - 博客园_files/lite-mode-on.svg" alt="简洁模式">
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown" style="display: none;">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="./Flutter Stream的使用 - R1cardo - 博客园_files/avatar-default.svg" alt="用户头像">
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="./Flutter Stream的使用 - R1cardo - 博客园_files/lite-mode-check.svg" class="hide" style="display: none;"><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup" style="display: inline;">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()" style="display: inline;">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+
+    <!--done-->
+<div id="home" style="margin-top: 299px;">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/r1cardo/"><img id="blogLogo" src="./Flutter Stream的使用 - R1cardo - 博客园_files/logo.gif" alt="返回主页"></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/r1cardo/">R1cardo</a>
+</h1>
+<h2></h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/r1cardo/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/R1cardo">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/r1cardo/rss/">
+订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<span id="stats_post_count">随笔 - 72&nbsp; </span>
+<span id="stats_article_count">文章 - 0&nbsp; </span>
+<span id="stats-comment_count">评论 - 0&nbsp; </span>
+<span id="stats-total-view-count">阅读 - 
+<span title="总阅读数: 25889">
+25889</span></span>
+
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent" style="">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class="postTitle">
+                
+<a id="cb_post_title_url" class="postTitle2 vertical-middle post-del-title" href="https://www.cnblogs.com/r1cardo/p/16029601.html">
+    <span role="heading" aria-level="2">Flutter Stream的使用</span>
+    
+
+</a><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body cnblogs-markdown">
+<span title-type="h1" class="header__span" style="transform:scale(1.0);"><h1 id="flutter-stream的使用" tid="tid-Efw3YT" class="header__dev"><span style=""><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><b class="dev__developer"><span class="dev__title">Flutter Stream的使用</span></b></h1></span>
+<span title-type="h2" class="header__span" style="transform:scale(0.9);left: -37.00px;"><h2 id="首先来了解一下stream是什么" tid="tid-7npxS8" class="header__dev"><span style="position: relative;left: -5px;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>1</i></b></span><b class="dev__developer"><span class="dev__title">首先，来了解一下stream是什么</span></b></h2></span>
+<ul>
+<li>异步数据事件的来源。</li>
+<li>流提供了一种接收一系列事件的方法。每个事件要么是一个数据事件，也称为流的元素，要么是一个错误<br>
+事件，即某事已失败的通知。当流发出所有事件时，单个“完成”事件将通知监听器已达到结束。</li>
+<li>您通过调用异步<em>函数生成流，然后返回流。消耗该流将导致函数发出事件，直到它结束，流关闭。您使用async或async</em>函数中可用的await for循环来消耗流，或者在async<em>函数中使用b yield</em>直接转发其事件</li>
+</ul>
+<span title-type="h2" class="header__span" style="transform:scale(0.9);left: -37.00px;"><h2 id="stream的四大要素" tid="tid-S4FE4R" class="header__dev"><span style="position: relative;left: -5px;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>2</i></b></span><b class="dev__developer"><span class="dev__title">Stream的四大要素</span></b></h2></span>
+<ul>
+<li>StreamController:作为整个流的控制器</li>
+<li>StreamSink:流事件入口</li>
+<li>Stream:事件源</li>
+<li>StreamSubscription:订阅管理</li>
+</ul>
+<span title-type="h2" class="header__span" style="transform:scale(0.9);left: -37.00px;"><h2 id="订阅模式" tid="tid-TCyWAA" class="header__dev"><span style="position: relative;left: -5px;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>3</i></b></span><b class="dev__developer"><span class="dev__title">订阅模式</span></b></h2></span>
+<ul>
+<li>Stream分为单订阅和多订阅模式</li>
+<li>一般创建的Stream都是单订阅模式，只能被监听一次，在创建StreamController时添加broadcast使其变为多订阅模式</li>
+</ul>
+<code-box id="HcbWJc" style="position: relative;display: block;"><button code-id="HcbWJc" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-HcbWJc" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_2 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-HcbWJc"><div id="mCSB_2" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_2_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-dTMJPh" style=""><code-line class="line-numbers-rows"></code-line>  <span class="hljs-type">StreamController</span> <span class="hljs-variable">controller</span> <span class="hljs-operator">=</span> StreamController.broadcast();
+</code-pre></div></div><div id="mCSB_2_scrollbar_vertical" class="mCSB_scrollTools mCSB_2_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_2_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_2_scrollbar_horizontal" class="mCSB_scrollTools mCSB_2_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_2_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h2" class="header__span" style="transform:scale(0.9);left: -37.00px;"><h2 id="创建流的方式" tid="tid-tpnA7w" class="header__dev"><span style="position: relative;left: -5px;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>4</i></b></span><b class="dev__developer"><span class="dev__title">创建流的方式</span></b></h2></span>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="streamcontroller" tid="tid-HccXQ2" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">StreamController</span></b></h3></span>
+<code-box id="yr2TTe" style="position: relative;display: block;"><button code-id="yr2TTe" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-yr2TTe" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_3 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-yr2TTe"><div id="mCSB_3" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_3_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-SGSJPx" style=""><code-line class="line-numbers-rows"></code-line>StreamController controller = StreamController.broadcast(onCancel: () {
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">print</span>(<span class="hljs-string">'onCancel'</span>);
+<code-line class="line-numbers-rows"></code-line>  }, onListen: () {
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">print</span>(<span class="hljs-string">'onListen'</span>);
+<code-line class="line-numbers-rows"></code-line>  });
+<code-line class="line-numbers-rows"></code-line>late Stream stream;
+<code-line class="line-numbers-rows"></code-line>late StreamSink sink;
+<code-line class="line-numbers-rows"></code-line>late StreamSubscription <span class="hljs-function"><span class="hljs-keyword">sub</span></span>;
+<code-line class="line-numbers-rows"></code-line><span class="hljs-keyword">int</span> count = <span class="hljs-number">0</span>;
+<code-line class="line-numbers-rows"></code-line>
+<code-line class="line-numbers-rows"></code-line>@override
+<code-line class="line-numbers-rows"></code-line>  void initState() {
+<code-line class="line-numbers-rows"></code-line>    super.initState();
+<code-line class="line-numbers-rows"></code-line>    stream = controller.stream;
+<code-line class="line-numbers-rows"></code-line>    sink = controller.sink;
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-function"><span class="hljs-keyword">sub</span> = <span class="hljs-title">stream</span>.<span class="hljs-title">listen</span>((<span class="hljs-title">event</span>) </span>{
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-keyword">print</span>(event);
+<code-line class="line-numbers-rows"></code-line>    });
+<code-line class="line-numbers-rows"></code-line>  }
+<code-line class="line-numbers-rows"></code-line>  
+<code-line class="line-numbers-rows"></code-line>  @override
+<code-line class="line-numbers-rows"></code-line>  void dispose() {
+<code-line class="line-numbers-rows"></code-line>    super.dispose();
+<code-line class="line-numbers-rows"></code-line>    controller.close();
+<code-line class="line-numbers-rows"></code-line>    sub.cancel();
+<code-line class="line-numbers-rows"></code-line>  }
+<code-line class="line-numbers-rows"></code-line>  
+<code-line class="line-numbers-rows"></code-line>  add() {
+<code-line class="line-numbers-rows"></code-line>    count++;
+<code-line class="line-numbers-rows"></code-line>    sink.add(count);
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_3_scrollbar_vertical" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_3_scrollbar_horizontal" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<ul>
+<li>通过StreamBuilder来接收数据</li>
+</ul>
+<code-box id="B3Nsw2" style="position: relative;display: block;"><button code-id="B3Nsw2" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-B3Nsw2" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_4 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-B3Nsw2"><div id="mCSB_4" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_4_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-kk3trs" style=""><code-line class="line-numbers-rows"></code-line><span class="hljs-variable">@override</span>
+<code-line class="line-numbers-rows"></code-line>  Widget build(BuildContext context) {
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-selector-tag">return</span> <span class="hljs-selector-tag">Scaffold</span>(
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-attribute">appBar</span>: AppBar(
+<code-line class="line-numbers-rows"></code-line>        <span class="hljs-attribute">title</span>: Text(<span class="hljs-string">'StreamPage'</span>),
+<code-line class="line-numbers-rows"></code-line>      ),
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-attribute">body</span>: StreamBuilder(
+<code-line class="line-numbers-rows"></code-line>          <span class="hljs-attribute">stream</span>: stream,
+<code-line class="line-numbers-rows"></code-line>          <span class="hljs-attribute">initialData</span>: count,
+<code-line class="line-numbers-rows"></code-line>          <span class="hljs-attribute">builder</span>: (_, snapshot) {
+<code-line class="line-numbers-rows"></code-line>            return Text(<span class="hljs-string">'$count'</span>);
+<code-line class="line-numbers-rows"></code-line>          }),
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-attribute">floatingActionButton</span>: IconButton(
+<code-line class="line-numbers-rows"></code-line>        <span class="hljs-attribute">icon</span>: Icon(Icons.add),
+<code-line class="line-numbers-rows"></code-line>        <span class="hljs-attribute">onPressed</span>: () =&gt; add(),
+<code-line class="line-numbers-rows"></code-line>      ),
+<code-line class="line-numbers-rows"></code-line>    );
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_4_scrollbar_vertical" class="mCSB_scrollTools mCSB_4_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_4_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_4_scrollbar_horizontal" class="mCSB_scrollTools mCSB_4_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_4_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<ul>
+<li>点击floatingActionButton，控制台打印</li>
+</ul>
+<code-box id="7rrs4h" style="position: relative;display: block;"><button code-id="7rrs4h" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-7rrs4h" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_5 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-7rrs4h"><div id="mCSB_5" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_5_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-t3pxdx" style=""><code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: onListen</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 1</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 2</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 3</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 4</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 5</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 6</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 7</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 8</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 9</span>
+<code-line class="line-numbers-rows"></code-line><span class="hljs-section">flutter: 10</span>
+</code-pre></div></div><div id="mCSB_5_scrollbar_vertical" class="mCSB_scrollTools mCSB_5_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_5_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_5_scrollbar_horizontal" class="mCSB_scrollTools mCSB_5_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_5_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="fromfuture" tid="tid-ebNB4B" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">FromFuture</span></b></h3></span>
+<p>首先创建一个Future函数</p>
+<code-box id="kWctJS" style="position: relative;display: block;"><button code-id="kWctJS" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-kWctJS" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_6 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-kWctJS"><div id="mCSB_6" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_6_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-NQ7tta" style=""><code-line class="line-numbers-rows"></code-line><span class="hljs-function">Future&lt;String&gt; <span class="hljs-title">fromFuture</span>() <span class="hljs-keyword">async</span></span> {
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">await</span> Future.delayed(Duration(seconds: <span class="hljs-number">1</span>), () {});
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">return</span> <span class="hljs-string">'fromFuture'</span>;
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_6_scrollbar_vertical" class="mCSB_scrollTools mCSB_6_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_6_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_6_scrollbar_horizontal" class="mCSB_scrollTools mCSB_6_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_6_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<p>通过FromFuture工厂函数创建流</p>
+<code-box id="EEQNF5" style="position: relative;display: block;"><button code-id="EEQNF5" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-EEQNF5" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_7 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-EEQNF5"><div id="mCSB_7" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_7_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-YNTRk7" style=""><code-line class="line-numbers-rows"></code-line>streamFromFuture() {
+<code-line class="line-numbers-rows"></code-line>    Stream stream = Stream.fromFuture(fromFuture());
+<code-line class="line-numbers-rows"></code-line>    stream.listen((event) {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-built_in">print</span>(<span class="hljs-string">'Stream.fromFuture <span class="hljs-subst">$event</span>'</span>);
+<code-line class="line-numbers-rows"></code-line>    }).onDone(() {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-built_in">print</span>(<span class="hljs-string">'Stream.fromFuture onDone'</span>);
+<code-line class="line-numbers-rows"></code-line>    });
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">return</span> stream;
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_7_scrollbar_vertical" class="mCSB_scrollTools mCSB_7_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_7_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_7_scrollbar_horizontal" class="mCSB_scrollTools mCSB_7_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_7_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="fromfutures" tid="tid-XKTMZQ" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">FromFutures</span></b></h3></span>
+<p>通过FromFutures工厂函数创建流,顾名思义，就是通过一个包含多个Future的Iterable创建流</p>
+<code-box id="naHBMy" style="position: relative;display: block;"><button code-id="naHBMy" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-naHBMy" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_8 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-naHBMy"><div id="mCSB_8" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_8_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-iQDdjC" style=""><code-line class="line-numbers-rows"></code-line>streamFromFutures() {
+<code-line class="line-numbers-rows"></code-line>    Stream stream =
+<code-line class="line-numbers-rows"></code-line>        Stream.fromFutures([fromFuture(), fromFuture(), fromFuture()]);
+<code-line class="line-numbers-rows"></code-line>    stream.listen((event) {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-built_in">print</span>(<span class="hljs-string">'Stream.fromFutures <span class="hljs-subst">$event</span>'</span>);
+<code-line class="line-numbers-rows"></code-line>    }).onDone(() {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-built_in">print</span>(<span class="hljs-string">'Stream.fromFutures onDone'</span>);
+<code-line class="line-numbers-rows"></code-line>    });
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">return</span> stream;
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_8_scrollbar_vertical" class="mCSB_scrollTools mCSB_8_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_8_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_8_scrollbar_horizontal" class="mCSB_scrollTools mCSB_8_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_8_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="fromiterable" tid="tid-My3ZTM" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">FromIterable</span></b></h3></span>
+<p>通过集合迭代对象创建流</p>
+<code-box id="nC3dHD" style="position: relative;display: block;"><button code-id="nC3dHD" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-nC3dHD" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_9 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-nC3dHD"><div id="mCSB_9" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_9_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-dsfYcp" style=""><code-line class="line-numbers-rows"></code-line><span class="hljs-title function_ invoke__">streamFromIterable</span>() {
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">final</span> List&lt;String&gt; <span class="hljs-keyword">iterable</span> = [<span class="hljs-string">'1'</span>, <span class="hljs-string">'2'</span>, <span class="hljs-string">'3'</span>, <span class="hljs-string">'4'</span>, <span class="hljs-string">'5'</span>];
+<code-line class="line-numbers-rows"></code-line>    Stream stream = Stream.<span class="hljs-title function_ invoke__">fromIterable</span>(<span class="hljs-keyword">iterable</span>);
+<code-line class="line-numbers-rows"></code-line>    stream.<span class="hljs-title function_ invoke__">listen</span>((event) {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-keyword">print</span>(<span class="hljs-string">'Stream.fromIterable $event'</span>);
+<code-line class="line-numbers-rows"></code-line>    }).<span class="hljs-title function_ invoke__">onDone</span>(() {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-keyword">print</span>(<span class="hljs-string">'Stream.fromIterable onDone'</span>);
+<code-line class="line-numbers-rows"></code-line>    });
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">return</span> stream;
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_9_scrollbar_vertical" class="mCSB_scrollTools mCSB_9_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_9_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_9_scrollbar_horizontal" class="mCSB_scrollTools mCSB_9_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_9_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="periodic" tid="tid-tWZtzH" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">periodic</span></b></h3></span>
+<p>创建以 [周期] 间隔重复发出事件的流。</p>
+<code-box id="iEMBPj" style="position: relative;display: block;"><button code-id="iEMBPj" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-iEMBPj" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_10 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-iEMBPj"><div id="mCSB_10" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_10_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-fB42Kx" style=""><code-line class="line-numbers-rows"></code-line>streamFromPeriodic() {
+<code-line class="line-numbers-rows"></code-line>    Stream stream = Stream.periodic(<span class="hljs-built_in">Duration</span>(seconds: <span class="hljs-number">1</span>), (i) =&gt; i + <span class="hljs-number">1</span>);
+<code-line class="line-numbers-rows"></code-line>    stream.listen((event) {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-built_in">print</span>(<span class="hljs-string">'Stream.periodic <span class="hljs-subst">$event</span>'</span>);
+<code-line class="line-numbers-rows"></code-line>    }).onDone(() {
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-built_in">print</span>(<span class="hljs-string">'Stream.periodic onDone'</span>);
+<code-line class="line-numbers-rows"></code-line>    });
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">return</span> stream;
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_10_scrollbar_vertical" class="mCSB_scrollTools mCSB_10_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_10_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_10_scrollbar_horizontal" class="mCSB_scrollTools mCSB_10_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_10_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="async" tid="tid-kyxTTr" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">async*</span></b></h3></span>
+<p>通过async*标记函数直接创建</p>
+<code-box id="sTrMDa" style="position: relative;display: block;"><button code-id="sTrMDa" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-sTrMDa" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_11 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-sTrMDa"><div id="mCSB_11" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_11_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-KATDty" style=""><code-line class="line-numbers-rows"></code-line><span class="hljs-function">Stream&lt;<span class="hljs-built_in">int</span>&gt; <span class="hljs-title">countStream</span>() <span class="hljs-keyword">async</span>*</span> {
+<code-line class="line-numbers-rows"></code-line>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++) {
+<code-line class="line-numbers-rows"></code-line>      count++;
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-keyword">await</span> Future.delayed(Duration(seconds: <span class="hljs-number">1</span>), () {});
+<code-line class="line-numbers-rows"></code-line>      <span class="hljs-keyword">yield</span> count;
+<code-line class="line-numbers-rows"></code-line>    }
+<code-line class="line-numbers-rows"></code-line>  }
+</code-pre></div></div><div id="mCSB_11_scrollbar_vertical" class="mCSB_scrollTools mCSB_11_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_11_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_11_scrollbar_horizontal" class="mCSB_scrollTools mCSB_11_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_11_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h2" class="header__span" style="transform:scale(0.9);left: -37.00px;"><h2 id="部分操作方法" tid="tid-5hHE8s" class="header__dev"><span style="position: relative;left: -5px;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>5</i></b></span><b class="dev__developer"><span class="dev__title">部分操作方法</span></b></h2></span>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="skip" tid="tid-2SFEzW" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">skip</span></b></h3></span>
+<ul>
+<li>跳过此流中的第一个 [2] 数据事件。</li>
+<li>返回一个流，该流发出的事件与此流在同时侦听时发出的事件相同，只是不会发出第一个 [2] 数据事件。当此流完成时，返回的流即告完成。</li>
+</ul>
+<code-box id="ZctAmX" style="position: relative;display: block;"><button code-id="ZctAmX" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-ZctAmX" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_12 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-ZctAmX"><div id="mCSB_12" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_12_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-bJYhNx" style=""><code-line class="line-numbers-rows"></code-line>stream<span class="hljs-selector-class">.skip</span>(<span class="hljs-number">2</span>);
+</code-pre></div></div><div id="mCSB_12_scrollbar_vertical" class="mCSB_scrollTools mCSB_12_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_12_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_12_scrollbar_horizontal" class="mCSB_scrollTools mCSB_12_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_12_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="skipwhile" tid="tid-QCR3d2" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">skipWhile</span></b></h3></span>
+<ul>
+<li>跳过此流中的数据事件，同时它们与 [i&gt;2] 匹配。</li>
+</ul>
+<code-box id="bJG6Ty" style="position: relative;display: block;"><button code-id="bJG6Ty" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-bJG6Ty" aria-label="复制代码" style="color: rgb(153, 153, 153);"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_13 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-bJG6Ty"><div id="mCSB_13" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_13_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-CdkeDb" style=""><code-line class="line-numbers-rows"></code-line>stream.<span class="hljs-title function_">skipWhile</span>(<span class="hljs-function">(<span class="hljs-params">i</span>)=&gt;</span>i&gt;<span class="hljs-number">2</span>);
+</code-pre></div></div><div id="mCSB_13_scrollbar_vertical" class="mCSB_scrollTools mCSB_13_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_13_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_13_scrollbar_horizontal" class="mCSB_scrollTools mCSB_13_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_13_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="take" tid="tid-NtFGiW" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">take</span></b></h3></span>
+<ul>
+<li>最多提供此流的第一个 [2] 数据事件。</li>
+<li>返回一个流，该流发出的事件与此流同时侦听时将发出的事件相同，直到此流结束或发出 [count] 数据事件，此时返回的流完成。</li>
+</ul>
+<code-box id="5jfzEk" style="position: relative;display: block;"><button code-id="5jfzEk" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-5jfzEk" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_14 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-5jfzEk"><div id="mCSB_14" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_14_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-RpF7dS" style=""><code-line class="line-numbers-rows"></code-line>stream<span class="hljs-selector-class">.take</span>(<span class="hljs-number">2</span>);
+</code-pre></div></div><div id="mCSB_14_scrollbar_vertical" class="mCSB_scrollTools mCSB_14_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_14_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_14_scrollbar_horizontal" class="mCSB_scrollTools mCSB_14_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_14_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="takewhile" tid="tid-B7bRnY" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">takeWhile</span></b></h3></span>
+<ul>
+<li>在 [ i &gt; 2] 条件满足时转发数据事件。</li>
+<li>返回一个流，该流提供与此流相同的事件，直到数据事件 [ i &gt; 2] 不满足。当此流完成时，或者当此流首次发出未通过 [test] 的数据事件时，将完成返回的流。</li>
+</ul>
+<code-box id="wiHNMX" style="position: relative;display: block;"><button code-id="wiHNMX" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-wiHNMX" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_15 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-wiHNMX"><div id="mCSB_15" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_15_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-ZKwMtk" style=""><code-line class="line-numbers-rows"></code-line>stream.<span class="hljs-title function_">takeWhile</span>(<span class="hljs-function">(<span class="hljs-params">i</span>) =&gt;</span> i &gt; <span class="hljs-number">2</span>);
+</code-pre></div></div><div id="mCSB_15_scrollbar_vertical" class="mCSB_scrollTools mCSB_15_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_15_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_15_scrollbar_horizontal" class="mCSB_scrollTools mCSB_15_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_15_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="where" tid="tid-QwtcHs" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">where</span></b></h3></span>
+<ul>
+<li>从此流创建一个丢弃某些元素（ i &gt; 2）的新流。</li>
+<li>新流发送与此流相同的错误和完成事件，但它仅发送满足 [test] 的数据事件。</li>
+</ul>
+<code-box id="DfF8wi" style="position: relative;display: block;"><button code-id="DfF8wi" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-DfF8wi" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_16 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-DfF8wi"><div id="mCSB_16" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_16_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-CGcSwr" style=""><code-line class="line-numbers-rows"></code-line>stream.<span class="hljs-title function_">where</span>(<span class="hljs-function">(<span class="hljs-params">i</span>) =&gt;</span> i &gt; <span class="hljs-number">2</span>);
+</code-pre></div></div><div id="mCSB_16_scrollbar_vertical" class="mCSB_scrollTools mCSB_16_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_16_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_16_scrollbar_horizontal" class="mCSB_scrollTools mCSB_16_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_16_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h3" class="header__span" style="transform:scale(0.8);left: -74.00px;"><h3 id="map" tid="tid-nMpyaw" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 32.00px;"></span><b class="dev__developer"><span class="dev__title">map</span></b></h3></span>
+<ul>
+<li>将此流的每个元素转换为新的流事件。</li>
+<li>创建一个新流，该流使用 [ i &gt; 2] 函数将此流的每个元素转换为新值，并发出结果。</li>
+</ul>
+<code-box id="M86kJR" style="position: relative;display: block;"><button code-id="M86kJR" type="button" class="clipboard code-copay-btn" data-clipboard-action="copy" data-clipboard-target="#pre-M86kJR" aria-label="复制代码" style="color: rgb(153, 153, 153); opacity: 0; visibility: hidden;"><i class="iconfont icon-fuzhi1"></i></button><pre class="highlighter-hljs mCustomScrollbar _mCS_17 mCS-autoHide mCS_no_scrollbar" highlighted="true" style="font-family: &quot;Ubuntu Mono&quot;, monospace !important; font-size: 14px !important; background-color: rgb(246, 248, 250); overflow: visible; position: relative;" id="pre-M86kJR"><div id="mCSB_17" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_17_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><code-pre class="code-pre" id="pre-CiKGrm" style=""><code-line class="line-numbers-rows"></code-line>stream.<span class="hljs-title function_">map</span>(<span class="hljs-function">(<span class="hljs-params">i</span>) =&gt;</span> i &gt; <span class="hljs-number">2</span>);
+</code-pre></div></div><div id="mCSB_17_scrollbar_vertical" class="mCSB_scrollTools mCSB_17_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_17_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 0px; top: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_17_scrollbar_horizontal" class="mCSB_scrollTools mCSB_17_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_17_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></pre></code-box>
+<span title-type="h4" class="header__span" style="transform:scale(0.7);left: -111.00px;"><h4 id="更多方法请移步" tid="tid-PZtMkr" class="header__dev"><span style="visibility: hidden;"><b class="dev__fe"><i>1</i></b><span class="dev__slash">|</span><b class="dev__ux"><i>0</i></b></span><span class="iconfont icon-weibiaoti22 titleIcon" style="left: 24.00px;"></span><b class="dev__developer"><span class="dev__title">更多方法请移步</span></b></h4></span>
+<p><a href="https://api.dart.cn/stable/2.16.1/dart-async/Stream-class.html" target="_blank" rel="noopener">Stream</a></p>
+
+<br><p class="essaySuffix-eof">__EOF__</p><div class="essaySuffix-box"><div class="essaySuffix-box-left"><img src="./Flutter Stream的使用 - R1cardo - 博客园_files/IMG_0885.JPG" alt=""></div><div class="essaySuffix-box-right"><span class="essaySuffix-right-title">本文作者</span>：<strong><span style="font-size: 12px;"><a href="https://www.cnblogs.com/r1cardo/p/16029601.html" target="_blank">R1cardo</a></span></strong> <br><span style="font-weight: bold; white-space:nowrap;">本文链接</span>：<a href="https://www.cnblogs.com/r1cardo/p/16029601.html" target="_blank">https://www.cnblogs.com/r1cardo/p/16029601.html</a><br><span class="essaySuffix-right-title">关于博主</span>：评论和私信会在第一时间回复。或者<a href="https://msg.cnblogs.com/msg/send/r1cardo" target="_blank">直接私信</a>我。<br><span class="essaySuffix-right-title">版权声明</span>：本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" alt="BY-NC-SA" title="BY-NC-SA" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！<br><span class="essaySuffix-right-title">声援博主</span>：如果您觉得文章对您有帮助，可以点击文章右下角<strong><span style="color: #ff0000; font-size: 12pt;">【<a id="post-up" onclick="votePost(16029601,&#39;Digg&#39;)" href="javascript:void(0);">推荐</a>】</span></strong>一下。您的鼓励是博主的最大动力！<br></div><div style="clear: both;"></div></div></div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+
+
+
+<div id="EntryTag">
+    标签: 
+            <a href="https://www.cnblogs.com/r1cardo/tag/Flutter/"><span class="iconfont icon-label_fill"></span>Flutter</a>
+,             <a href="https://www.cnblogs.com/r1cardo/tag/Stream/"><span class="iconfont icon-label_fill"></span>Stream</a>
+</div>
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(16029601,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow(&#39;e026356e-d41a-4954-8c49-08d8d71b3f30&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./Flutter Stream的使用 - R1cardo - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./Flutter Stream的使用 - R1cardo - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/r1cardo/" target="_blank"><img src="./Flutter Stream的使用 - R1cardo - 博客园_files/20230204201517.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/r1cardo/">R1cardo</a>
+            <br>
+            <a href="https://home.cnblogs.com/u/r1cardo/followers/">粉丝 - <span class="follower-count">0</span></a>
+            <a href="https://home.cnblogs.com/u/r1cardo/followees/">关注 - <span class="following-count">0</span></a><br>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow" class="follow-tip">
+                <a href="javascript:void(0);" onclick="follow(&#39;e026356e-d41a-4954-8c49-08d8d71b3f30&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(16029601,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(16029601,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/r1cardo/p/15976477.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/r1cardo/p/15976477.html" data-featured-image="" title="发布于 2022-03-07 16:18">Flutter TextField设置值后光标位置偏移</a>
+    <br>
+    <a href="https://www.cnblogs.com/r1cardo/p/16055647.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/r1cardo/p/16055647.html" data-featured-image="" title="发布于 2022-03-25 17:04">有关终端Github无法访问，connection timed out:443等问题</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc" style="display: block;">posted @ 
+<span id="post-date" data-last-update-days="464.94564761597104" data-date-created="BlogServer.Application.Dto.BlogPost.BlogPostDto" data-date-updated="2022-03-20 12:44" aria-expanded="false">2022-03-20 12:44</span>&nbsp;
+<a href="https://www.cnblogs.com/r1cardo/">R1cardo</a>&nbsp;
+阅读(<span id="post_view_count">355</span>)&nbsp;
+评论(<span id="post_comment_count">0</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=16029601" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(16029601);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: &#39;&#39;, targetType: &#39;blogPost&#39;, targetId: &#39;16029601&#39;, targetLink: &#39;https://www.cnblogs.com/r1cardo/p/16029601.html&#39;, title: &#39;Flutter Stream的使用&#39; })">举报</a>
+</div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+
+<script>
+    var cb_entryId = 16029601, cb_entryCreatedDate = '2022-03-20 12:44', cb_postType = 1, cb_postTitle = 'Flutter Stream的使用';
+    var allowComments = true, cb_blogId = 678901, cb_blogApp = 'r1cardo', cb_blogUserGuid = 'e026356e-d41a-4954-8c49-08d8d71b3f30';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");
+    updatePostStats(
+            [cb_entryId],
+            function(id, count) { $("#post_view_count").text(count) },
+            function(id, count) { $("#post_comment_count").text(count) });
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    登录后才能查看或发表评论，立即 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return account.login(&#39;!comments&#39;);">登录</a> 或者
+    <a href="https://www.cnblogs.com/">逛逛</a> 博客园首页
+</div>
+</div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"><a href="https://www.cnblogs.com/cmt/p/17510065.html" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-行行AI人才-直播第4期&#39;})">【推荐】行行AI人才直播第4期（周四20:30）： 如何定制企业专属AI大模型？</a><br><a href="https://cloud.tencent.com/act/cps/redirect?redirect=5049&amp;cps_key=6a15b90f1178f38fb09b07f16943cf3e&amp;from=console" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-腾讯云&#39;})">【推荐】腾讯云爆款云服务器首年95元，领折上折代金券最高再省1120元</a><br><a href="https://www.cnblogs.com/cmt/p/17477579.html" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-阿里云云市场&#39;})">【推荐】园子的商业化努力-阿里云云市场合作-第一期优惠活动发布上线</a><br><a href="https://click.aliyun.com/m/1000374205/" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-阿里云&#39;})">【推荐】阿里云-持续降低用云成本：云服务器全面降价，低至0.3元/天</a><br></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card" style="display: none;">
+            <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px; display: none;" data-google-query-id="COGD0p2C5f8CFd5gDwIdoNkJmA"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt none; width: 300px; height: 0px;"></div></div>
+    </div>
+    <div id="under_post_card1"><div class="under-post-card">
+<b>编辑推荐：</b>
+<br>
+
+· <a href="https://www.cnblogs.com/niexianda/p/17506382.html" target="_blank">闲来无事-树莓派控制风扇启停</a>
+    <br>
+· <a href="https://www.cnblogs.com/artech/p/inside-asp-net-core-6-40.html" target="_blank">ASP.NET Core 6框架揭秘实例演示[40]：基于角色的授权</a>
+    <br>
+· <a href="https://www.cnblogs.com/youzhibing/p/17384635.html" target="_blank">记一次字符串末尾空白丢失的排查，MySQL 是会玩的！</a>
+    <br>
+· <a href="https://www.cnblogs.com/huangxincheng/p/17490807.html" target="_blank">记一次 .NET 某旅行社审批系统 崩溃分析</a>
+    <br>
+· <a href="https://www.cnblogs.com/tangyanzhi1111/p/17489381.html" target="_blank">C#/.Net的多播委托到底是啥？彻底剖析下</a>
+    <br>
+</div></div>
+    <div id="under_post_card2"><div class="itnews under-post-card">
+    <b>阅读排行：</b>
+    <br>
+ ·          <a href="https://www.cnblogs.com/xueweihan/p/17504304.html" target="_blank">11k+ Star 一款更适合中国用户的开源 BI 工具</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/skychen1218/p/17508657.html" target="_blank">三年，能否成为一名真正的架构师</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/chaego/p/17507817.html" target="_blank">记一次.net加密神器 Eazfuscator.NET 2023.2  最新版 使用尝试</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/niexianda/p/17506382.html" target="_blank">闲来无事-树莓派控制风扇启停</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/huangxincheng/p/17505313.html" target="_blank">Docker 中的 .NET 异常了怎么抓 Dump</a>
+        <br>
+</div></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem">
+    <h3 class="catListTitle">公告</h3>
+<div id="blog-news"><div class="container">    <div class="menu-wrap optiscroll is-enabled" id="menuWrap" style="display:none"><div class=" optiscroll-content" style="right: -3px; bottom: -3px;">        <nav class="menu">            <!-- 个人简介 -->            <div class="introduce-box">                <div class="introduce-head">                    <div class="introduce-via" id="menuBlogAvatar"><img src="./Flutter Stream的使用 - R1cardo - 博客园_files/IMG_0885.JPG"></div>                </div>                <div id="introduce">
+    昵称：
+    <a href="https://home.cnblogs.com/u/r1cardo/">
+        R1cardo
+    </a>
+    <br>
+    园龄：
+    <a href="https://home.cnblogs.com/u/r1cardo/" title="入园时间：2021-03-17">
+        2年3个月
+    </a>
+    <br>
+    粉丝：
+    <a class="follower-count" href="https://home.cnblogs.com/u/r1cardo/followers/">
+        0
+    </a>
+    <br>
+    关注：
+    <a class="folowing-count" href="https://home.cnblogs.com/u/r1cardo/followees/">
+        0
+    </a>
+    <div id="p_b_follow" class="follow-tip">
+<a href="javascript:void(0)" onclick="follow(&#39;e026356e-d41a-4954-8c49-08d8d71b3f30&#39;)">+加关注</a></div>
+    
+</div>            </div>            <!-- 导航 -->            <div class="nav-title"></div>            <div class="icon-list">                <ul id="m-nav-list">                <li><a href="https://www.cnblogs.com/r1cardo/" target="_self"><i class="iconfont icon-homepage_fill"></i>首页</a></li><li><a href="https://msg.cnblogs.com/send/r1cardo" target="_blank"><i class="iconfont icon-zhifeiji"></i>联系</a></li><li><a href="javascript:void(0)" onclick="$(&#39;#blog_nav_rss&#39;).trigger(&#39;click&#39;);" data-rss="https://www.cnblogs.com/r1cardo/rss/"><i class="iconfont icon-qinmifu"></i>订阅</a></li><li><a href="https://i.cnblogs.com/" target="_blank"><i class="iconfont icon-setup_fill"></i>管理</a></li></ul>            </div>            <!-- 日历 -->            <span id="calendar-box"><div id="blog-calendar" style="visibility: visible;">
+
+<table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2023/05/28&#39;); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2023年6月</td>
+                            <td align="right" class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2023/07/28&#39;); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" align="center" abbr="日" scope="col">日</th>
+        <th class="CalDayHeader" align="center" abbr="一" scope="col">一</th>
+        <th class="CalDayHeader" align="center" abbr="二" scope="col">二</th>
+        <th class="CalDayHeader" align="center" abbr="三" scope="col">三</th>
+        <th class="CalDayHeader" align="center" abbr="四" scope="col">四</th>
+        <th class="CalDayHeader" align="center" abbr="五" scope="col">五</th>
+        <th class="CalDayHeader" align="center" abbr="六" scope="col">六</th>
+    </tr>
+            <tr>
+                            <td class="CalOtherMonthDay" align="center">28</td>
+                            <td class="CalOtherMonthDay" align="center">29</td>
+                            <td class="CalOtherMonthDay" align="center">30</td>
+                            <td class="CalOtherMonthDay" align="center">31</td>
+                        <td class="" align="center">
+                            1
+                        </td>
+                        <td class="" align="center">
+                            2
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        3
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            4
+                        </td>
+                            <td class="" align="center">
+                                5
+                            </td>
+                            <td class="" align="center">
+                                6
+                            </td>
+                            <td class="" align="center">
+                                7
+                            </td>
+                            <td class="" align="center">
+                                8
+                            </td>
+                            <td class="" align="center">
+                                9
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            10
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            11
+                        </td>
+                            <td class="" align="center">
+                                12
+                            </td>
+                            <td class="" align="center">
+                                13
+                            </td>
+                            <td class="" align="center">
+                                14
+                            </td>
+                            <td class="" align="center">
+                                15
+                            </td>
+                            <td class="" align="center">
+                                16
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            17
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            18
+                        </td>
+                            <td class="" align="center">
+                                19
+                            </td>
+                            <td class="" align="center">
+                                20
+                            </td>
+                            <td class="" align="center">
+                                21
+                            </td>
+                            <td class="" align="center">
+                                22
+                            </td>
+                            <td class="" align="center">
+                                23
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            24
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            25
+                        </td>
+                            <td class="" align="center">
+                                26
+                            </td>
+                            <td class="" align="center">
+                                27
+                            </td>
+                            <td class="CalTodayDay" align="center">
+                                28
+                            </td>
+                            <td class="" align="center">
+                                29
+                            </td>
+                            <td class="" align="center">
+                                30
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            1
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalOtherMonthDay" align="center">
+                            2
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                3
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                4
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                5
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                6
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                7
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            8
+                        </td>
+                </tr>
+    </tbody>
+</table></div></span>            <!-- 找找看 -->            <div class="m-list-title" style="display: block;"><span>找找看</span></div>            <div class="m-icon-list" id="sb-sidebarSearchBox"><div id="sb_widget_my_zzk" class="div_my_zzk"><input id="q" type="text" onkeydown="return zzk_go_enter(event);" class="input_my_zzk"></div></div>            <!-- 积分与排名 -->            <div class="m-list-title"><span>积分排名<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-sidebarScorerank"></div>            <!-- 最新随笔 -->            <div class="m-list-title"><span>最新随笔<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-sidebarRecentposts"></div>            <!-- 我的标签 -->            <div class="m-list-title" style="display: block;"><span>我的标签<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-toptags"><div><ul><li><a href="https://www.cnblogs.com/r1cardo/tag/Flutter/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Flutter(36)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/IOS/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>IOS(25)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/GetX/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>GetX(5)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/%E5%AE%89%E5%8D%93/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>安卓(4)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/ListView/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>ListView(3)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/Android/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Android(3)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/%E5%A4%9A%E7%BA%BF%E7%A8%8B/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>多线程(3)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/NSOperation/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>NSOperation(3)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/git/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>git(2)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/dart/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>dart(2)</a></li><li><a href="https://www.cnblogs.com/r1cardo/tag/"><span class="iconfont icon-label_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>更多</a></li></ul></div></div>            <!-- 随笔分类 -->            <div class="m-list-title"><span>随笔分类<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-classify"></div>            <!-- 文章分类 -->            <div class="m-list-title"><span>文章分类<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-ArticleCategory"></div>            <!-- 阅读排行 -->            <div class="m-list-title" style="display: block;"><span>阅读排行<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-topview"><div><ul><li><a href="https://www.cnblogs.com/r1cardo/p/14826320.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>关于Git上传项目报错error: RPC failed; HTTP 413 curl 22 The requested URL returned error: 413(5105)</a></li><li><a href="https://www.cnblogs.com/r1cardo/p/15597022.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Flutter 错误The argument type 'Color' can't be assigned to the parameter type 'MaterialStateProperty<color?>?'.dart(argument_type_not_assignable)(2241)</color?></a></li><li><a href="https://www.cnblogs.com/r1cardo/p/16055765.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Flutter获取当前路由信息和全局路由监听(1896)</a></li><li><a href="https://www.cnblogs.com/r1cardo/p/15589162.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Flutter WebView报错ERR_NAME_NOT_RESOLVED(1490)</a></li><li><a href="https://www.cnblogs.com/r1cardo/p/15510605.html"><span class="iconfont icon-browse_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Flutter问题 Flutter MissingPluginException(No implementation found for method xxx on channel xxx)(907)</a></li></ul></div></div>            <!-- 推荐排行 -->            <div class="m-list-title" style="display: block;"><span>推荐排行<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-topDiggPosts"><div><ul><li><a href="https://www.cnblogs.com/r1cardo/p/16063844.html"><span class="iconfont icon-like_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Flutter查漏补缺1(1)</a></li><li><a href="https://www.cnblogs.com/r1cardo/p/15597022.html"><span class="iconfont icon-like_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Flutter 错误The argument type 'Color' can't be assigned to the parameter type 'MaterialStateProperty<color?>?'.dart(argument_type_not_assignable)(1)</color?></a></li><li><a href="https://www.cnblogs.com/r1cardo/p/15513684.html"><span class="iconfont icon-like_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>Attribute application@label value=(xxx) from AndroidManifest.xml:8:16-37 is also present at [com.github.adrielcafe:AndroidAudioConverter:0.0.8] AndroidManifest.xml:11:18-50 value=(@string/app_name)(1)</a></li><li><a href="https://www.cnblogs.com/r1cardo/p/14826320.html"><span class="iconfont icon-like_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>关于Git上传项目报错error: RPC failed; HTTP 413 curl 22 The requested URL returned error: 413(1)</a></li></ul></div></div>            <!-- 最新评论 -->            <div class="m-list-title"><span>最新评论<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-recentComments"></div>            <!-- 文章档案 -->            <div class="m-list-title"><span>文章档案<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-articlearchive"></div>            <!-- 随笔档案 -->            <div class="m-list-title" style="display: block;"><span>随笔档案<span class="iconfont icon-select m-list-title-select"></span></span></div>            <div class="m-icon-list" id="sb-record"><div><ul><li><a href="https://www.cnblogs.com/r1cardo/archive/2023/05.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2023年5月(8)</a></li><li><a href="https://www.cnblogs.com/r1cardo/archive/2023/04.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2023年4月(21)</a></li><li><a href="https://www.cnblogs.com/r1cardo/archive/2023/02.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2023年2月(8)</a></li><li><a href="https://www.cnblogs.com/r1cardo/archive/2022/03.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2022年3月(8)</a></li><li><a href="https://www.cnblogs.com/r1cardo/archive/2021/11.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2021年11月(22)</a></li><li><a href="https://www.cnblogs.com/r1cardo/archive/2021/09.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2021年9月(1)</a></li><li><a href="https://www.cnblogs.com/r1cardo/archive/2021/06.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2021年6月(1)</a></li><li><a href="https://www.cnblogs.com/r1cardo/archive/2021/05.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target=""><span class="iconfont icon-task_fill" style="color: #888;font-size: 14px;margin-right: 5px;"></span>2021年5月(3)</a></li></ul></div></div>            <!-- 自定义列表 -->            <span id="menuCustomList"></span>        </nav>        <button class="close-button" id="close-button">Close Menu</button>        <div class="morph-shape" id="morph-shape" data-morph-open="M-7.312,0H15c0,0,66,113.339,66,399.5C81,664.006,15,800,15,800H-7.312V0z;M-7.312,0H100c0,0,0,113.839,0,400c0,264.506,0,400,0,400H-7.312V0z">            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 800" preserveAspectRatio="none">                <path d="M-7.312,0H0c0,0,0,113.839,0,400c0,264.506,0,400,0,400h-7.312V0z"></path>            <desc>Created with Snap</desc><defs></defs></svg>        </div>    </div><div class="optiscroll-v"><b class="optiscroll-vtrack"></b></div><div class="optiscroll-h"><b class="optiscroll-htrack"></b></div></div>    <button class="menu-button menu-button-scroll" id="open-button"></button>    <div class="content-wrap" id="content-wrap"></div><!-- /content-wrap --></div><div class="main-header" style="height: 40vh; background: url(&quot;https://cdn.jsdelivr.net/gh/BNDong/Cnblogs-Theme-SimpleMemory@master/img/webp/nothome_top_bg.webp&quot;) center center / cover no-repeat rgb(34, 34, 34);">    <canvas id="notHomeTopCanvas" width="1410" height="299"></canvas>    <div class="vertical">        <div class="main-header-content inner" style="max-width: 100vw;">            <h1 class="page-title" id="homeTopTitle" style="display: none;">R1cardo</h1>            <h2 class="page-description" id="hitokoto"></h2>            <h3 class="page-author" id="hitokotoAuthor"></h3>            <h1 class="sb-title" id="sbTitle">
+    Flutter Stream的使用
+    
+
+</h1>            <p class="article-info" id="articleInfo"><p class="article-info-text"><span class="postMeta"><i class="iconfont icon-time1"></i>发表于 2022-03-20 12:44<i class="iconfont icon-browse"></i>阅读：355<i class="iconfont icon-interactive"></i>评论：0<i class="iconfont icon-hot"></i>推荐：0</span></p><a href="https://www.cnblogs.com/r1cardo/tag/Flutter/" target="_blank"><span class="article-info-tag article-tag-color">Flutter</span></a><a href="https://www.cnblogs.com/r1cardo/tag/Stream/" target="_blank"><span class="article-info-tag article-tag-color">Stream</span></a></p>        </div>    </div>    <a class="scroll-down" href="javascript:void(0);" data-offset="-45" style="display: none;">        <span class="hidden">Scroll Down</span>        <i class="scroll-down-icon iconfont icon-fanhui"></i>    </a></div><div id="loading" style="display: none;"></div><div id="bottomProgressBar"><div id="top-progress-bar" style="position: relative; top: 0px; left: 0px; right: 0px; background-color: rgb(119, 182, 255); height: 2px; width: 73%; transition: width 0.2s ease 0s, opacity 0.6s ease 0s; opacity: 1;"></div></div><div id="rightMenu"><div id="rightDiggit" clickflg="false" onclick="votePost(16029601,&#39;Digg&#39;)"><span class="rightMenuSpan rightDiggitSpan">0</span><i class="iconfont icon-zan1"></i></div><div id="rightBuryit" clickflg="false" onclick="votePost(16029601,&#39;Bury&#39;)"><span class="rightMenuSpan rightBuryitSpan">0</span><i class="iconfont icon-buzan"></i></div><div id="attention" onclick="follow(&#39;e026356e-d41a-4954-8c49-08d8d71b3f30&#39;)" clickflg="false"><span class="rightMenuSpan attentionSpan">关注</span><i class="iconfont icon-dianzan"></i></div><div id="toUpDown" data="up"><span class="rightMenuSpan toUpDownSpan" style="display: none; opacity: 0.9;">返回顶部</span><div id="toUpDownI" style="transform: rotate(0deg); transform-origin: 50% 50%;"><i class="iconfont icon-zhiding"></i></div></div></div>    
+    <div id="sidebar_news_content"><script type="text/javascript">window['__document_write_ajax_callbacks__']['5']();</script><script type="text/javascript">window['__document_write_ajax_callbacks__']['1']();</script>
+<script type="text/javascript">window['__document_write_ajax_callbacks__']['6']();</script><script type="text/javascript">window['__document_write_ajax_callbacks__']['7']();</script><script>window['__document_write_ajax_callbacks__']['2']();</script>
+<script type="text/javascript">window['__document_write_ajax_callbacks__']['8']();</script><script type="text/javascript">window['__document_write_ajax_callbacks__']['3']();</script>
+<div id="profile_block">
+    昵称：
+    <a href="https://home.cnblogs.com/u/r1cardo/">
+        R1cardo
+    </a>
+    <br>
+    园龄：
+    <a href="https://home.cnblogs.com/u/r1cardo/" title="入园时间：2021-03-17">
+        2年3个月
+    </a>
+    <br>
+    粉丝：
+    <a class="follower-count" href="https://home.cnblogs.com/u/r1cardo/followers/">
+        0
+    </a>
+    <br>
+    关注：
+    <a class="folowing-count" href="https://home.cnblogs.com/u/r1cardo/followees/">
+        0
+    </a>
+    <div id="p_b_follow" class="follow-tip">
+<a href="javascript:void(0)" onclick="follow(&#39;e026356e-d41a-4954-8c49-08d8d71b3f30&#39;)">+加关注</a></div>
+    <script type="text/javascript">window['__document_write_ajax_callbacks__']['9']();</script><script>window['__document_write_ajax_callbacks__']['4']();</script>
+</div>
+</div>
+</div>
+<script>loadBlogNews();</script>
+
+ 
+</div>
+<div id="sidebar_c3"></div>
+			<script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"><!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block"><div class="catListLink">
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    <li><a href="https://www.cnblogs.com/r1cardo/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/r1cardo/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/r1cardo/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/r1cardo/comments" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/r1cardo/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+</ul>
+</div>
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block"><div class="catListTag">
+    <h3 class="catListTitle"><a href="https://www.cnblogs.com/r1cardo/tag/" class="sidebar-card-title-a">我的标签</a></h3>
+<ul>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/Flutter/">Flutter<span class="tag-count">(36)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/IOS/">IOS<span class="tag-count">(25)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/GetX/">GetX<span class="tag-count">(5)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/%E5%AE%89%E5%8D%93/">安卓<span class="tag-count">(4)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/ListView/">ListView<span class="tag-count">(3)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/Android/">Android<span class="tag-count">(3)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程<span class="tag-count">(3)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/NSOperation/">NSOperation<span class="tag-count">(3)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/git/">git<span class="tag-count">(2)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/r1cardo/tag/dart/">dart<span class="tag-count">(2)</span></a>
+        </li>
+    <li>
+        <a href="https://www.cnblogs.com/r1cardo/tag/">更多</a>
+    </li>
+
+</ul>
+</div>
+
+</div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+
+    <div id="sidebar_postarchive" class="catListPostArchive sidebar-block">
+        <h3 class="catListTitle">
+            
+随笔档案
+
+
+        </h3>
+
+        <ul>
+
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2023/05.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2023年5月(8)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2023/04.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2023年4月(21)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2023/02.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2023年2月(8)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2022/03.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2022年3月(8)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2021/11.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2021年11月(22)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2021/09.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2021年9月(1)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2021/06.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2021年6月(1)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/r1cardo/archive/2021/05.html" style="--cnb-category-item-link-indent-size: calc(0 * 1em)" class="category-item-link" rel="" target="">2021年5月(3)</a>
+ 
+                </li>                
+            
+        </ul>
+
+
+    </div>    
+</div>
+
+<!-- 最新评论 -->
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block"><div class="catListView">
+    <h3 class="catListTitle">
+        <a href="https://www.cnblogs.com/r1cardo/most-viewed" class="sidebar-card-title-a">
+    阅读排行榜
+</a>
+
+    </h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/r1cardo/p/14826320.html">
+                            1. 关于Git上传项目报错error: RPC failed; HTTP 413 curl 22 The requested URL returned error: 413(5105)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/r1cardo/p/15597022.html">
+                            2. Flutter 错误The argument type 'Color' can't be assigned to the parameter type 'MaterialStateProperty&lt;Color?&gt;?'.dart(argument_type_not_assignable)(2241)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/r1cardo/p/16055765.html">
+                            3. Flutter获取当前路由信息和全局路由监听(1896)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/r1cardo/p/15589162.html">
+                            4. Flutter WebView报错ERR_NAME_NOT_RESOLVED(1490)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/r1cardo/p/15510605.html">
+                            5. Flutter问题 Flutter MissingPluginException(No implementation found for method xxx on channel xxx)(907)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block"></div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">
+            <a href="https://www.cnblogs.com/r1cardo/most-liked" class="sidebar-card-title-a">推荐排行榜</a>
+
+        </h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/r1cardo/p/16063844.html">
+                                1. Flutter查漏补缺1(1)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/r1cardo/p/15597022.html">
+                                2. Flutter 错误The argument type 'Color' can't be assigned to the parameter type 'MaterialStateProperty&lt;Color?&gt;?'.dart(argument_type_not_assignable)(1)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/r1cardo/p/15513684.html">
+                                3. Attribute application@label value=(xxx) from AndroidManifest.xml:8:16-37 is also present at [com.github.adrielcafe:AndroidAudioConverter:0.0.8] AndroidManifest.xml:11:18-50 value=(@string/app_name)(1)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/r1cardo/p/14826320.html">
+                                4. 关于Git上传项目报错error: RPC failed; HTTP 413 curl 22 The requested URL returned error: 413(1)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div></div><div id="sidebar_recentcomments" class="sidebar-block"></div>
+
+
+</div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer"><footer><footer-background><figure class="clouds"></figure><figure class="background"></figure><figure class="foreground"></figure></footer-background></footer><div class="footer-box"><div><span id="blogRunTimeSpan">This blog has running : 833 d 3 h 33 m 2 s</span><span class="my-face">ღゝ◡╹)ノ♡</span></div><div id="blogrollInfo"></div><div>
+		
+Copyright © 2023 R1cardo
+Powered by .NET 7.0 on Kubernetes
+
+
+
+	</div><div id="cnzzInfo"></div><div id="themeInfo">Theme version: <a href="https://github.com/BNDong/Cnblogs-Theme-SimpleMemory/tree/v1.3.2" target="_blank" style="color: #888;text-decoration: underline;">v1.3.2</a> / Loading theme version: <a href="https://github.com/BNDong/Cnblogs-Theme-SimpleMemory/tree/v1.3.2" target="_blank" style="color: #888;text-decoration: underline;">v1.3.2</a></div></div></div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8DuWIYDefEVJtUW7VadsHY_DfHq69dORl_H1x4H2j_H6kny9FaIUPn_mr82RZJkwkZ9AxLWrDh36jUkSi_KfMkQGqlNcjb5ojnw0IiCAHz78UvUvN7_1_BMPqrnGf2KbLeoHz8gxRvp0eQsJDyD8-ig">
+    <script async="" src="./Flutter Stream的使用 - R1cardo - 博客园_files/js"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    var kv = getGACustom();
+    if (kv) {
+        gtag('set', kv);
+    }
+    gtag('config', 'UA-476124-1');
+</script>
+<script defer="" src="./Flutter Stream的使用 - R1cardo - 博客园_files/hm.js.下载"></script>
+
+<script type="text/javascript">
+    window.cnblogsConfig = {
+        GhVersions    : 'v1.3.2', // 版本
+        blogUser      : "R1cardo", // 用户名
+        blogAvatar    : "https://gitee.com/chanicaGo/chanica-images/raw/master/img/IMG_0885.JPG", // 用户头像
+        blogStartDate : "2021-3-17", // 入园时间，年-月-日。入园时间查看方法：鼠标停留园龄时间上，会显示入园时间
+    }
+</script><script type="text/javascript">
+(function(window,document,undefined){
+        var hearts = [];
+        window.requestAnimationFrame = (function(){
+                return window.requestAnimationFrame || 
+                           window.webkitRequestAnimationFrame ||
+                           window.mozRequestAnimationFrame ||
+                           window.oRequestAnimationFrame ||
+                           window.msRequestAnimationFrame ||
+                           function (callback){
+                                   setTimeout(callback,1000/60);
+                           }
+        })();
+        init();
+        function init(){
+                css(".heart{width: 10px;height: 10px;position: fixed;background: #f00;transform: rotate(45deg);-webkit-transform: rotate(45deg);-moz-transform: rotate(45deg);}.heart:after,.heart:before{content: '';width: inherit;height: inherit;background: inherit;border-radius: 50%;-webkit-border-radius: 50%;-moz-border-radius: 50%;position: absolute;}.heart:after{top: -5px;}.heart:before{left: -5px;}");
+                attachEvent();
+                gameloop();
+        }
+        function gameloop(){
+                for(var i=0;i<hearts.length;i++){
+                    if(hearts[i].alpha <=0){
+                            document.body.removeChild(hearts[i].el);
+                            hearts.splice(i,1);
+                            continue;
+                    }
+                    hearts[i].y--;
+                    hearts[i].scale += 0.004;
+                    hearts[i].alpha -= 0.013;
+                    hearts[i].el.style.cssText = "left:"+hearts[i].x+"px;top:"+hearts[i].y+"px;opacity:"+hearts[i].alpha+";transform:scale("+hearts[i].scale+","+hearts[i].scale+") rotate(45deg);background:"+hearts[i].color;
+            }
+            requestAnimationFrame(gameloop);
+        }
+        function attachEvent(){
+                var old = typeof window.onclick==="function" && window.onclick;
+                window.onclick = function(event){
+                        old && old();
+                        createHeart(event);
+                }
+        }
+        function createHeart(event){
+            var d = document.createElement("div");
+            d.className = "heart";
+            hearts.push({
+                    el : d,
+                    x : event.clientX - 5,
+                    y : event.clientY - 5,
+                    scale : 1,
+                    alpha : 1,
+                    color : randomColor()
+            });
+            document.body.appendChild(d);
+    }
+    function css(css){
+            var style = document.createElement("style");
+                style.type="text/css";
+                try{
+                    style.appendChild(document.createTextNode(css));
+                }catch(ex){
+                    style.styleSheet.cssText = css;
+                }
+                document.getElementsByTagName('head')[0].appendChild(style);
+    }
+        function randomColor(){
+                return "rgb("+(~~(Math.random()*255))+","+(~~(Math.random()*255))+","+(~~(Math.random()*255))+")";
+        }
+})(window,document);
+</script><script type="text/javascript">getFollowStatus('e026356e-d41a-4954-8c49-08d8d71b3f30');</script><iframe src="./Flutter Stream的使用 - R1cardo - 博客园_files/container.html" style="visibility: hidden; display: none;"></iframe><canvas id="bgCanvas" width="1413" height="746" style="display: block; position: fixed; margin: 0px; padding: 0px; border: 0px; outline: 0px; left: 0px; top: 0px; width: 100%; height: 100%; z-index: -1;"></canvas><div id="sideToolbar" style="display: block; top: 304px; right: 0px;" class="sideToolbarFix"><span class="catalog-btn catalog-btn-shadow" style="display: none;"><i class="iconfont icon-mulu"></i></span><div class="sideCatalogBg" id="sideCatalog" style=""><div id="sideCatalog-sidebar"><div class="sideCatalog-sidebar-top"></div><div class="sideCatalog-sidebar-bottom"></div></div><div id="sideCatalog-catalog" class="mCustomScrollbar _mCS_1 mCS-autoHide mCS_no_scrollbar" style="overflow: visible;"><div id="mCSB_1" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" style="max-height: none;" tabindex="0"><div id="mCSB_1_container" class="mCSB_container mCS_y_hidden mCS_no_scrollbar_y mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr"><ul class="nav" style="width: 230px; zoom: 1;"><li h="1" g="1" class=""><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#flutter-stream%E7%9A%84%E4%BD%BF%E7%94%A8" goto="tid-Efw3YT" onclick="return false;">1.0&nbsp;&nbsp;Flutter Stream的使用</a><span class="sideCatalog-dot"></span></li><li h="2" g="1" class="h2Offset ceg1" style="display: list-item;"><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#%E9%A6%96%E5%85%88%E6%9D%A5%E4%BA%86%E8%A7%A3%E4%B8%80%E4%B8%8Bstream%E6%98%AF%E4%BB%80%E4%B9%88" goto="tid-7npxS8" onclick="return false;">1.1&nbsp;&nbsp;首先，来了解一下stream是什么</a></li><li h="2" g="1" class="h2Offset ceg1" style="display: list-item;"><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#stream%E7%9A%84%E5%9B%9B%E5%A4%A7%E8%A6%81%E7%B4%A0" goto="tid-S4FE4R" onclick="return false;">1.2&nbsp;&nbsp;Stream的四大要素</a></li><li h="2" g="1" class="h2Offset ceg1" style="display: list-item;"><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#%E8%AE%A2%E9%98%85%E6%A8%A1%E5%BC%8F" goto="tid-TCyWAA" onclick="return false;">1.3&nbsp;&nbsp;订阅模式</a></li><li h="2" g="1" class="h2Offset ceg1" style="display: list-item;"><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#%E5%88%9B%E5%BB%BA%E6%B5%81%E7%9A%84%E6%96%B9%E5%BC%8F" goto="tid-tpnA7w" onclick="return false;">1.4&nbsp;&nbsp;创建流的方式</a></li><li h="2" g="1" class="h2Offset ceg1 active" style="display: list-item;"><a href="https://www.cnblogs.com/r1cardo/p/16029601.html#%E9%83%A8%E5%88%86%E6%93%8D%E4%BD%9C%E6%96%B9%E6%B3%95" goto="tid-5hHE8s" onclick="return false;">1.5&nbsp;&nbsp;部分操作方法</a></li></ul></div></div><div id="mCSB_1_scrollbar_vertical" class="mCSB_scrollTools mCSB_1_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_1_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; top: 0px; height: 0px;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_1_scrollbar_horizontal" class="mCSB_scrollTools mCSB_1_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_1_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; display: block; width: 0px; left: 0px;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div></div></div><a href="javascript:void(0);" id="sideCatalogBtn" class="sideCatalogBtnDisable"></a></div><iframe src="./Flutter Stream的使用 - R1cardo - 博客园_files/syncframe.html" width="0" height="0" frameborder="0" title="Criteo GUM iframe" style="border-width: 0px; margin: 0px; display: none;"></iframe><iframe src="./Flutter Stream的使用 - R1cardo - 博客园_files/aframe.html" width="0" height="0" style="display: none;"></iframe></body></html>

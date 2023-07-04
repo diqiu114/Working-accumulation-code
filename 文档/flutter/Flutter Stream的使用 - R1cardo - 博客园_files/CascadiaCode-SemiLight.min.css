@@ -1,0 +1,23 @@
+@font-face {
+  font-family: "Cascadia Code-SemiLight";
+  src: url("https://common.cnblogs.com/fonts/CascadiaCode-SemiLight.woff2") format("woff2");
+  font-style: normal;
+}
+html {
+  --code-font: "Cascadia Code-SemiLight", "Courier New", sans-serif, Consolas, Monaco;
+}
+pre,
+.hljs,
+pre[class*="language-"] code[class*="language-"],
+pre[class*="language-"] code,
+pre[class*="language-"] code[class*="language-"],
+.prismjs-engine code[class*="language-"],
+.prismjs-engine pre[class*="language-"],
+.prismjs-engine pre[class*="language-"] code[class*="language-"],
+pre code,
+pre code.hljs {
+  font-family: "Cascadia Code-SemiLight", "Courier New", sans-serif, Consolas, Monaco;
+  font-family: "Cascadia Code-SemiLight", "Courier New", sans-serif, Consolas, Monaco;
+  font-family: var(--code-font, '"Courier New", sans-serif, Consolas, Monaco');
+}
+
