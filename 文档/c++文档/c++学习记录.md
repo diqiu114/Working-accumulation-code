@@ -311,3 +311,23 @@ int i = 10;
 }
 ```
 
+
+
+## 模板
+
+形如：
+
+```
+template <typename T>
+T minimum(const T& lhs, const T& rhs)
+{
+    return lhs < rhs ? lhs : rhs;
+}
+```
+
+在编译中，编译器会推导T类型，然后再把模板中的t替换掉
+
+### typename 
+
+**`typename`** 向编译器提供未知标识符为类型的提示。 在模板参数列表中，它用于指定类型参数
+
