@@ -92,3 +92,81 @@ pip uninstall silk-python && pip install git+https://github.com/DCZYewen/Python-
 2. 然后，使用`pip install`命令从GitHub上安装一个名为`Python-Silk-Module`的软件包。它是从指定的GitHub仓库（https://github.com/DCZYewen/Python-Silk-Module）中安装的。
 
 完美解决这个包构建问题
+
+
+
+
+
+
+
+
+
+# 教程学习
+
+## list和tuple
+
+```
+# 列表
+list = ["list1", "list2", "list3"]
+# 元组，初始化后元素就不可更改，单元素指向的数据可以改，只有一个元素时要注意加","
+tuple = ("tuple", )
+tuple2 = ("tuple2", ["list1", "list2"])
+tuple2[1][1] = "list3"
+```
+
+## dict
+
+```
+# dict（map），查找键对应值，这是一种高效的方法，以空间换时间，不会随着列表变长而变长
+map = {"xiaoming":"daxia", "xiaohong":"caiji"}
+# 直接提取时，当没有该键，就会报错
+print(map["xiaoming"])
+# 使用get方法，返回none，或指定为-1
+print(map.get("caiji"))
+print(map.get("caiji")==None)
+print(map.get("caiji", -1))
+```
+
+## 函数
+
+```
+# ******函数
+# 定义了一个函数，在函数定义时，默认参数L会实例化
+def add_end(L=[]):
+    L.append('END')
+    return L
+
+# 有一个list
+func_list = [1, 2, 3]
+# 添加进去，但是，函数add_end中的L指向了func_list
+add_end(func_list)
+print(func_list)
+
+# 空参数，L就是定义时的L
+func_list2 = add_end()
+
+add_end(func_list)
+print(func_list)
+
+# L再次被添加'END'
+func_list3 = add_end()
+# func_list3填充为：['END', 'END']
+print(func_list3)
+```
+
+注意：**默认参数**
+
+```
+# 用不变对象None，再返回，就不会产生
+def add_end(L=None):
+    if L==None:
+        L = []
+    L.append('END')
+    return L
+
+func_list2 = add_end()
+func_list3 = add_end()
+print(func_list2)
+print(func_list3)
+```
+
