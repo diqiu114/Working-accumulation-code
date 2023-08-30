@@ -170,3 +170,122 @@ print(func_list2)
 print(func_list3)
 ```
 
+
+
+## 高级特性
+
+简化代码数量，相当于语法糖
+
+### 切片：":"
+
+场景：取一个list或tuple的部分元素是非常常见的操作。这时，就可以使用切片。
+
+例子：有一个list，对其切片
+
+```
+list_list = []
+for num in range(0, 10):
+    list_list.append(num)
+print(list_list)
+# 头一个到倒数第二个
+print(list_list[:-1])
+# 第三个到倒数第二个
+print(list_list[2:-1])
+```
+
+输出得到
+
+```
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+[0, 1, 2, 3, 4, 5, 6, 7, 8]
+[2, 3, 4, 5, 6, 7, 8]
+```
+
+
+
+## 内建函数
+
+### open
+
+用于打开文件：一般使用方式为：
+
+```
+open(file_name, "r")
+```
+
+后面跟的字符串"r"，表示打开方式，常用打开方式有：
+
+| r    | 以只读方式打开文件。文件的指针将会放在文件的开头。这是默认模式。 |
+| ---- | ------------------------------------------------------------ |
+| w    | 打开一个文件只用于写入。如果该文件已存在则打开文件，并从开头开始编辑，即原有内容会被删除。如果该文件不存在，创建新文件。 |
+| a    | 追加写入，打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。 |
+
+详细可见：
+
+[菜鸟教程]: https://www.runoob.com/python/python-func-open.html
+
+
+
+### 迭代
+
+
+
+
+
+#### 补充读写文件注意项
+
+读写文件时，open文件后要记得关闭，在python中提供了相应的语法糖：**with**，一般使用方法为：
+
+```python
+# 打开一个文件，遍历文件每行，并输出
+with open(file_new_name, "r+") as file:
+    for line_file in file:
+        print(line_file)
+```
+
+上述方式，在遇到文件比较大时，可能导致爆内存，大文件推荐使用临时文件读取
+
+```py
+input_filename = "file_name"
+output_filename = "out_" + input_filename
+with open(input_filename, "r") as input_file, open(output_filename, "a") as output_file:
+    for line in input_file:
+        # 在每一行前添加 "=="
+        modified_line = "==\n" + line
+        output_file.write(modified_line)
+```
+
+上述方式不仅读了大文件，还对大文件每行进行了写操作。
+
+直接在原文件上遍历写的话，可能比较复杂，chatgpt没有给出完美的解决方案，可能干的人少，理由是：源文件直接写，中途的错误，可能会直接导致源文件数据的丢失和损坏。
+
+
+
+以下有一种每行读并写入文本的错误操作方式：
+
+```py
+with open(file_new_name, "r+") as file:
+    for line_file in file:
+        print(line_file)
+        # file.flush()
+        file.write("test===")
+        file.write("test2===")
+```
+
+运行后得到文件：
+
+```
+asdfsdf
+asdfsdf
+asdfsdfsdf
+test===test2===
+```
+
+而且控制台输出只有第一行：asdfsdf，后面就直接运行结束了，出现这个想想的可能原因，chatgpt回答：
+
+```
+在Python中，您的代码片段试图在使用'r+'模式打开文件时，一边读取文件内容一边进行写入操作。然而，这种方法可能会导致问题，因为'r+'模式的文件操作并不是严格的“读取再写入”操作，它涉及了文件指针的位置和缓冲区的管理，这可能会导致意外的结果。
+
+特别是在处理大文件时，同时进行读写操作可能会导致文件指针位置混乱，内容被覆盖，甚至文件损坏。此外，缓冲区的管理也可能会导致一些数据在写入之前仍然在内存中，而不会立即写入到文件中。
+```
+
