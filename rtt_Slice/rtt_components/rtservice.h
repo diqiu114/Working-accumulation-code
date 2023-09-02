@@ -166,7 +166,7 @@ rt_inline unsigned int rt_list_len(const rt_list_t *l)
     for (pos = rt_list_entry((head)->next, typeof(*pos), member), \
          n = rt_list_entry(pos->member.next, typeof(*pos), member); \
          &pos->member != (head); \
-         pos = n, n = rt_list_entry(n->member.next, typeof(*n), member))
+         pos = n, n = rt_list_entr0y    (n->member.next, typeof(*n), member))
 
 /**
  * rt_list_first_entry - get the first element from a list

@@ -68,10 +68,38 @@ static int test_print()
   rt_memcmp(test_buffer, test_butter_buffer, sizeof(test_buffer));
   rt_kprintf("%s  |\r\n", test_buffer);
   rt_kprintf("test_test\r\n");
+
   return 0;
 }
 INIT_BOARD_EXPORT(test_print);
 
+
+typedef struct
+{
+  rt_list_t list_node;
+  uint32_t data;
+}test_list_t;
+
+static int teset_list()
+{
+  test_list_t data1, data2, data3;
+  rt_kprintf("teset_list\r\n");
+  data1.data = 10;
+  data2.data = 20;
+  data3.data = 30;
+  rt_list_init(&data1.list_node);
+  rt_list_init(&data2.list_node);
+  rt_list_init(&data3.list_node);
+  rt_list_insert_after(&data1.list_node, &data2.list_node);
+  rt_list_insert_after(&data1.list_node, &data3.list_node);
+  rt_list_t* p;
+  rt_list_for_each(p, &data2.list_node)
+  {
+    rt_kprintf("%d\r\n", rt_list_entry(p, test_list_t, list_node)->data);
+  }
+  return 0;
+}
+INIT_BOARD_EXPORT(teset_list);
 /**
   * @brief  The application entry point.
   * @retval int
