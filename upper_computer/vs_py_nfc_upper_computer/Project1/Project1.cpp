@@ -294,7 +294,6 @@ enum
     Wirte_Card = 1,
     Read_Card,
     Close_Device,
-
 };
 
 static HID_DEVICE g_hDevice = HID_DEVICE(-1);  //g_hDevice must be initialized as -1 before use
@@ -352,6 +351,11 @@ int main()
         return 0;
     }
     Sleep(5); //Appropriate delay after Sys_SetAntenna operating
+    // 蜂鸣器叫两声
+    Sys_SetBuzzer(g_hDevice, 5);
+    Sleep(100);
+    Sys_SetBuzzer(g_hDevice, 5);
+
     //Tips
     // DEBUG_OUT << "Connect reader succeed !" << endl;	
     // DEBUG_OUT << "请给命令" << endl;
@@ -370,9 +374,11 @@ int main()
                 string hexString;
                 std::cin >> hexString;
                 if (!Error_check(Wirte_card(g_hDevice, hexString))) {
+                    Sys_SetBuzzer(g_hDevice, 30);
                     break;
                 }
                 CMD_OUT << RETURN_TURE_FLAGE << endl;
+                Sys_SetBuzzer(g_hDevice, 5);
             }break;
 
             case Read_Card: {
@@ -387,6 +393,7 @@ int main()
                      CMD_OUT << setw(2) << setfill('0') << hex << hex_val;
                 }
                  CMD_OUT << endl;
+                 Sys_SetBuzzer(g_hDevice, 5);
             }break;
 
             case Close_Device :{
@@ -401,6 +408,9 @@ int main()
 
 out_even:
 
+    // 蜂鸣器叫声
+    Sys_SetBuzzer(g_hDevice, 30);
+    Sleep(300);
     if(FALSE != Sys_IsOpen(g_hDevice))
     {
         status = Sys_Close(&g_hDevice);
@@ -414,4 +424,6 @@ out_even:
             // DEBUG_OUT << "失败原因:" << status;
         }
     }
+
+    return status;
 }
