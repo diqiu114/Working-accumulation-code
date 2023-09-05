@@ -1,38 +1,55 @@
 import subprocess
 import ndef as ndef
-# 启动一个控制台应用程序
-print("启动一个控制台应用程序")
+import os as os
+import time
+
+def Read_card(process):
+    process.stdin.write("读卡" + "\n")
+    process.stdin.flush()
+    return process.stdout.readline()
+
+def Write_card(process, write_data):
+    process.stdin.write("写卡" + "\n")
+    process.stdin.flush()  # 刷新输入流
+    time.sleep(0.05)
+    write_state = process.stdout.readline()
+    if "_false_" in write_data :
+        print("写卡前准备失败：" + write_data)
+        return False
+    process.stdin.write(write_data + "\n")
+    process.stdin.flush()  # 刷新输入流
+    time.sleep(0.05)
+    write_state = process.stdout.readline()
+    if "_false_" in write_data :
+        print("写卡失败：" + write_data)
+        return False
+    return True
+
 process = subprocess.Popen(["Release/Project1.exe"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-# 向控制台应用程序的stdin写入数据
-# input_data = "world!\n"  # 换行符是为了模拟用户按下回车
-# process.stdin.write(input_data)
-# process.stdin.flush()  # 刷新输入流
+time.sleep(0.5)
 
-# 读取控制台应用程序的输出
-output = process.stdout.read(2000)
-print(output)
+# data = "03189101075502676d782e61745101095402656ee5bf97e5bcba"
+# print(Read_card(process))
+# print(Write_card(process, data))
+# print(Read_card(process))
 
-# 如果需要发送更多输入，重复上述步骤
-# ...
 
 # 编码ndef消息记录
-# record1 = ndef.UriRecord(f"https://www.bilibili.com")
-# record2 = ndef.TextRecord(f"杨志强大帅哥")
-# message = [record1, record2]
-# buf = b"".join((ndef.message_encoder(message)))
-# lenth = len(bytes.fromhex(buf.hex()))
-# print("长度为：" + str(lenth))
+record1 = ndef.UriRecord(f"https://www.bilibili.com")
+record2 = ndef.TextRecord(f"杨志强大帅哥")
+message = [record1, record2]
+buf = b"".join((ndef.message_encoder(message)))
+lenth = len(bytes.fromhex(buf.hex()))
+print("长度为：" + str(lenth))
 
-# write_hex_str = "03"+ hex(lenth)[2:] + buf.hex()
+write_hex_str = "03"+ hex(lenth)[2:] + buf.hex()
 
-# input_data = write_hex_str + "\n"  # 换行符是为了模拟用户按下回车
+input_data = write_hex_str + "\n"  # 换行符是为了模拟用户按下回车
 
-# print("====pyton写入：" + input_data)
+print("====pyton写入：" + input_data)
+print(Write_card(process, input_data))
+print(Read_card(process))
 
-# process.stdin.write(input_data)
-# process.stdin.flush()  # 刷新输入流
-# output = process.stdout.read(2000)
-# print(output)
 
 # 关闭控制台应用程序的stdin
 process.stdin.close()
