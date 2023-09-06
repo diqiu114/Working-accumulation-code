@@ -71,17 +71,26 @@ class MyMainWindow(QMainWindow):
                 uri_record = record
 
         # 打印解码后的TextRecord和UriRecord
-        if text_record:
-            print("TextRecord:", text_record.text)
-        if uri_record:
-            print("UriRecord:", uri_record.uri)
+        try:
+            text = text_record.text
+        except AttributeError as e:
+            text = " "
+        else:
+            pass
+
+        try:
+            uri = uri_record.uri
+        except AttributeError as e:
+            uri = " "
+        else:
+            pass
 
         self.ui.read_text_widegt.clear()
         self.ui.read_text_widegt.setText(
             "消息类型:" + str(messge_type) + "\n"
             +"消息承载长度：" + str(messge_lenth) + "\n"
-            +"链接：" +  uri_record.uri + "\n"
-            +"文本：" + text_record.text + "\n"
+            +"链接：" +  uri + "\n"
+            +"文本：" + text + "\n"
         )
 
         
@@ -137,7 +146,7 @@ def main():
     app = QApplication(sys.argv)
     main_window = MyMainWindow()
     main_window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()
