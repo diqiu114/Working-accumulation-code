@@ -1,5 +1,4 @@
 import subprocess
-import ndef as ndef
 import os as os
 import time
 
@@ -31,34 +30,37 @@ def Open_device():
     return process
 
 def Close_device(process):
+    process.stdin.write("关闭读卡器" + "\n")
+    process.stdin.flush()  # 刷新输入流
+    time.sleep(0.05)
         # 关闭控制台应用程序的stdin
     process.stdin.close()
-
+    
     # 等待控制台应用程序完成
     process.wait()
 
     # 关闭所有流
     process.stdout.close()
     process.stderr.close()
+    process = ""
+    print("关闭完成")
 
-    print("运行完成")
+# def Test(process):
+#     # 编码ndef消息记录
+#     record1 = ndef.UriRecord(f"https://www.bilibili.com")
+#     record2 = ndef.TextRecord(f"杨志强大帅哥...")
+#     message = [record1, record2]
+#     buf = b"".join((ndef.message_encoder(message)))
+#     lenth = len(bytes.fromhex(buf.hex()))
+#     print("长度为：" + str(lenth))
 
-def Test(process):
-    # 编码ndef消息记录
-    record1 = ndef.UriRecord(f"https://www.bilibili.com")
-    record2 = ndef.TextRecord(f"杨志强大帅哥...")
-    message = [record1, record2]
-    buf = b"".join((ndef.message_encoder(message)))
-    lenth = len(bytes.fromhex(buf.hex()))
-    print("长度为：" + str(lenth))
+#     write_hex_str = "03"+ hex(lenth)[2:] + buf.hex()
 
-    write_hex_str = "03"+ hex(lenth)[2:] + buf.hex()
+#     input_data = write_hex_str + "\n"  # 换行符是为了模拟用户按下回车
 
-    input_data = write_hex_str + "\n"  # 换行符是为了模拟用户按下回车
-
-    print("====pyton写入：" + input_data)
-    print(Write_card(process, input_data))
-    print(Read_card(process))
+#     print("====pyton写入：" + input_data)
+#     print(Write_card(process, input_data))
+#     print(Read_card(process))
 
 
 
