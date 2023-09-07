@@ -289,10 +289,39 @@ int Read_card(HID_DEVICE device, BYTE* read_buffer, int lenth)
         return status;
 }
 
+int Lock_card(HID_DEVICE device)
+{
+    // 根据数据手册，锁卡就是对page页的写权限失效，那么锁卡就只需要对
+    // Dynamic Lock Bytes和Static Lock Bytes每位全写1即可，就会3h后的所有页
+    int status = 0;
+    // 锁静态页，即写Static Lock Bytes
+    BYTE read_buffer_static[4] = {0};
+    BYTE read_buffer_dynamic[4] = {0};
+
+    BYTE temp_lenth = 0;
+    TyA_UL_FastRead(device, 2, 2, read_buffer_static, &temp_lenth);
+    // 除能写权限
+    read_buffer_static[2] = 0xff;
+    read_buffer_static[3] = 0xff;
+    // 这里必须两个区域全部写完，不能因为前一个TyA_UL_Write出错就返回
+    status = TyA_UL_Write(device, 2, read_buffer_static);
+    for(int cnt = 0; cnt < sizeof(read_buffer_dynamic) / sizeof(*read_buffer_dynamic); cnt++) {
+        read_buffer_dynamic[cnt] = 0xff;
+        //DEBUG_OUT << (int)read_buffer_dynamic[cnt];
+    }
+    if(status==0) {
+        status = TyA_UL_Write(device, 40, read_buffer_dynamic);
+    }
+    // 实验证明，调用函数TyA_UL_Write对锁卡标位置位写时，尽管已经锁卡，但是函数并不会返回错误
+    //DEBUG_OUT << status << endl;
+    return status;
+}
+
 enum
 {
     Wirte_Card = 1,
     Read_Card,
+    Lock_Card,
     Close_Device,
 };
 
@@ -304,6 +333,7 @@ int main()
     map<string, int> cmd_map;
     cmd_map["写卡"] = Wirte_Card;
     cmd_map["读卡"] = Read_Card;
+    cmd_map["锁卡"] = Lock_Card;
     cmd_map["关闭读卡器"] = Close_Device;
 
     if(FALSE != Sys_IsOpen(g_hDevice))
@@ -394,6 +424,15 @@ int main()
                 }
                  CMD_OUT << endl;
                  Sys_SetBuzzer(g_hDevice, 5);
+            }break;
+
+            case Lock_Card: {
+                if (!Error_check(Connect_nfc_card(g_hDevice)))
+                    break;
+                if (!Error_check(Lock_card(g_hDevice)))
+                    break;
+                CMD_OUT << RETURN_TURE_FLAGE << endl;
+                Sys_SetBuzzer(g_hDevice, 5);
             }break;
 
             case Close_Device :{

@@ -2,6 +2,9 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
 from Ui_untitled import Ui_MainWindow
 
+from qt_material import apply_stylesheet
+
+
 import test
 import ndef as ndef
 
@@ -21,6 +24,7 @@ class MyMainWindow(QMainWindow):
         self.ui.open_button.clicked.connect(self.Open_dev_button_clicked)
         self.ui.close_button.clicked.connect(self.Close_dev_button_clicked)
         self.ui.less_button.clicked.connect(self.Less_button_clicked)
+        self.ui.lock_button.clicked.connect(self.Lock_button_clicked)
         # self.ui.auto_add_check_box.stateChanged.connect()
 
     def __del__(self):
@@ -64,16 +68,21 @@ class MyMainWindow(QMainWindow):
         uri_record = None
 
         # 遍历解码后的NFC记录并分别存储TextRecord和UriRecord
-        for record in ndef_decode:
-            if isinstance(record, ndef.TextRecord):
-                text_record = record
-            elif isinstance(record, ndef.UriRecord):
-                uri_record = record
+        try:
+            for record in ndef_decode:
+                if isinstance(record, ndef.TextRecord):
+                    text_record = record
+                elif isinstance(record, ndef.UriRecord):
+                    uri_record = record
+        except:
+            pass
+        else:
+            pass
 
         # 打印解码后的TextRecord和UriRecord
         try:
             text = text_record.text
-        except AttributeError as e:
+        except :
             text = " "
         else:
             pass
@@ -127,7 +136,10 @@ class MyMainWindow(QMainWindow):
                 if text:
                     write_text = str(int(text) +1)
                     self.ui.write_text_widegt.setText(write_text)
-            
+
+    def Lock_button_clicked(self):
+        if self.process:
+            test.Lock_card( self.process)
 
     def Open_dev_button_clicked(self):
         self.process = test.Open_device()
@@ -145,6 +157,9 @@ class MyMainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     main_window = MyMainWindow()
+
+    apply_stylesheet(app, theme='light_red.xml')
+
     main_window.show()
     sys.exit(app.exec())
 

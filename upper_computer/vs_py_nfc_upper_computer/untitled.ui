@@ -127,6 +127,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="lock_button">
+            <property name="text">
+             <string>锁卡</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="less_button">
             <property name="text">
              <string>-1</string>

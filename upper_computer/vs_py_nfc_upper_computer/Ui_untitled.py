@@ -96,6 +96,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.write_button)
 
+        self.lock_button = QPushButton(self.centralwidget)
+        self.lock_button.setObjectName(u"lock_button")
+
+        self.horizontalLayout_2.addWidget(self.lock_button)
+
         self.less_button = QPushButton(self.centralwidget)
         self.less_button.setObjectName(u"less_button")
 
@@ -135,6 +140,7 @@ class Ui_MainWindow(object):
         self.write_url_widegt.setPlainText(QCoreApplication.translate("MainWindow", u"https://h5.clewm.net/?url=qr61.cn%2FooCZ0Y%2Fq3TEwEl&hasredirect=1", None))
         self.auto_add_check_box.setText(QCoreApplication.translate("MainWindow", u"\u81ea\u52a8+1", None))
         self.write_button.setText(QCoreApplication.translate("MainWindow", u"\u5199\u5165", None))
+        self.lock_button.setText(QCoreApplication.translate("MainWindow", u"\u9501\u5361", None))
         self.less_button.setText(QCoreApplication.translate("MainWindow", u"-1", None))
     # retranslateUi
 

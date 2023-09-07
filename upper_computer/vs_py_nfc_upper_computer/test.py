@@ -24,6 +24,16 @@ def Write_card(process, write_data):
         return False
     return True
 
+def Lock_card(process):
+    process.stdin.write("锁卡" + "\n")
+    process.stdin.flush()  # 刷新输入流
+    time.sleep(0.05)
+    write_state = process.stdout.readline()
+    if "_false_" in write_state :
+        print("锁卡失败：" + write_state)
+        return False
+    return True
+
 def Open_device():
     process = subprocess.Popen(["Release/Project1.exe"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     time.sleep(0.5)
