@@ -1,76 +1,40 @@
-import subprocess
-import os as os
-import time
+import sys
+from PySide6.QtWidgets import QApplication, QDialog, QDialogButtonBox, QVBoxLayout
 
-def Read_card(process):
-    process.stdin.write("读卡" + "\n")
-    process.stdin.flush()
-    return process.stdout.readline()
+class MyDialog(QDialog):
+    def __init__(self):
+        super().__init__()
 
-def Write_card(process, write_data):
-    process.stdin.write("写卡" + "\n")
-    process.stdin.flush()  # 刷新输入流
-    time.sleep(0.05)
-    write_state = process.stdout.readline()
-    if "_false_" in write_state :
-        print("写卡前准备失败：" + write_state)
-        return False
-    process.stdin.write(write_data + "\n")
-    process.stdin.flush()  # 刷新输入流
-    time.sleep(0.05)
-    write_state = process.stdout.readline()
-    if "_false_" in write_state :
-        print("写卡失败：" + write_state)
-        return False
-    return True
+        self.setWindowTitle('获取按钮状态示例')
+        self.setGeometry(100, 100, 400, 200)
 
-def Lock_card(process):
-    process.stdin.write("锁卡" + "\n")
-    process.stdin.flush()  # 刷新输入流
-    time.sleep(0.05)
-    write_state = process.stdout.readline()
-    if "_false_" in write_state :
-        print("锁卡失败：" + write_state)
-        return False
-    return True
+        layout = QVBoxLayout(self)
 
-def Open_device():
-    process = subprocess.Popen(["Release/Project1.exe"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    time.sleep(0.5)
-    return process
+        button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel | QDialogButtonBox.Apply, self)
+        layout.addWidget(button_box)
 
-def Close_device(process):
-    process.stdin.write("关闭读卡器" + "\n")
-    process.stdin.flush()  # 刷新输入流
-    time.sleep(0.05)
-        # 关闭控制台应用程序的stdin
-    process.stdin.close()
-    
-    # 等待控制台应用程序完成
-    process.wait()
+        # 连接按钮的信号到相应的槽函数
+        button_box.accepted.connect(self.ok_handler)
+        button_box.rejected.connect(self.cancel_handler)
+        button_box.button(QDialogButtonBox.Apply).clicked.connect(self.apply_handler)
 
-    # 关闭所有流
-    process.stdout.close()
-    process.stderr.close()
-    process = ""
-    print("关闭完成")
+    def ok_handler(self):
+        print("用户点击了'确定'按钮")
+        self.accept()  # 关闭对话框
 
-# def Test(process):
-#     # 编码ndef消息记录
-#     record1 = ndef.UriRecord(f"https://www.bilibili.com")
-#     record2 = ndef.TextRecord(f"杨志强大帅哥...")
-#     message = [record1, record2]
-#     buf = b"".join((ndef.message_encoder(message)))
-#     lenth = len(bytes.fromhex(buf.hex()))
-#     print("长度为：" + str(lenth))
+    def cancel_handler(self):
+        print("用户点击了'取消'按钮")
+        self.reject()  # 关闭对话框
 
-#     write_hex_str = "03"+ hex(lenth)[2:] + buf.hex()
+    def apply_handler(self):
+        print("用户点击了'应用'按钮")
+        # 执行应用按钮的逻辑
+        self.accept()  # 关闭对话框
 
-#     input_data = write_hex_str + "\n"  # 换行符是为了模拟用户按下回车
+def main():
+    app = QApplication(sys.argv)
+    dialog = MyDialog()
+    dialog.exec_()
 
-#     print("====pyton写入：" + input_data)
-#     print(Write_card(process, input_data))
-#     print(Read_card(process))
-
-
-
+if __name__ == '__main__':
+    main()

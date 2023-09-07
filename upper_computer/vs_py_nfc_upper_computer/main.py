@@ -1,15 +1,23 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget
+from PySide6.QtCore import Qt
+
+
 from Ui_untitled import Ui_MainWindow
+
+# from Ui_file_select_widget import Ui_MainWindow as Second_window
 
 from qt_material import apply_stylesheet
 
 
-import test
+import save_data_in_excel
+
+import nfc_cmd_io as nfc_cmd_io
 import ndef as ndef
 
-
 class MyMainWindow(QMainWindow):
+    save_file_addr = ""
+
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
@@ -25,12 +33,19 @@ class MyMainWindow(QMainWindow):
         self.ui.close_button.clicked.connect(self.Close_dev_button_clicked)
         self.ui.less_button.clicked.connect(self.Less_button_clicked)
         self.ui.lock_button.clicked.connect(self.Lock_button_clicked)
+        
+        self.ui.save_histry_file_check_box.stateChanged.connect(self.Check_box_changed)
+
         # self.ui.auto_add_check_box.stateChanged.connect()
 
     def __del__(self):
         if self.process:
-            test.Close_device(self.process)
+            nfc_cmd_io.Close_device(self.process)
 
+    def Check_box_changed(self, state):
+        if state == Qt.CheckState.Checked.value:
+            save_data_in_excel.Open_file(self)
+        
 
     process = ""
     def Read_button_clicked(self):
@@ -40,7 +55,7 @@ class MyMainWindow(QMainWindow):
 
         print("read button点击")
         # 读取到数据
-        ndef_data = test.Read_card(self.process)
+        ndef_data = nfc_cmd_io.Read_card(self.process)
         # 解码
         try:
             byte_data = bytes.fromhex(ndef_data)
@@ -130,7 +145,7 @@ class MyMainWindow(QMainWindow):
         print(input_data)
 
         # 复选框选择，则自动加1
-        if test.Write_card(self.process, input_data):
+        if nfc_cmd_io.Write_card(self.process, input_data):
             if self.ui.auto_add_check_box.isChecked():
                 text = self.ui.write_text_widegt.toPlainText()
                 if text:
@@ -139,14 +154,14 @@ class MyMainWindow(QMainWindow):
 
     def Lock_button_clicked(self):
         if self.process:
-            test.Lock_card( self.process)
+            nfc_cmd_io.Lock_card( self.process)
 
     def Open_dev_button_clicked(self):
-        self.process = test.Open_device()
+        self.process = nfc_cmd_io.Open_device()
 
     def Close_dev_button_clicked(self):
         if self.process:
-            test.Close_device(self.process)
+            nfc_cmd_io.Close_device(self.process)
 
     def Less_button_clicked(self):
         text = self.ui.write_text_widegt.toPlainText()
@@ -157,25 +172,12 @@ class MyMainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     main_window = MyMainWindow()
-
+    
     apply_stylesheet(app, theme='light_red.xml')
-
+    
     main_window.show()
+    
     sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()
-
-# def main():
-#     #固定的，PyQt5程序都需要QApplication对象。sys.argv是命令行参数列表，确保程序可以双击运行
-#     # 这里用的是qtside6
-#     app = QApplication(sys.argv)
-#     #初始化
-#     myWin = MyMainForm()
-#     #将窗口控件显示在屏幕上
-#     myWin.show()
-#     #程序运行，sys.exit方法确保程序完整退出。
-#     sys.exit(app.exec())
-
-# if __name__ == '__main__':
-#     main()

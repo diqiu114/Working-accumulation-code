@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(692, 279)
+        MainWindow.resize(734, 352)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
@@ -32,10 +32,6 @@ class Ui_MainWindow(object):
         self.verticalSpacer_2 = QSpacerItem(20, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.gridLayout.addItem(self.verticalSpacer_2, 0, 0, 1, 1)
-
-        self.verticalSpacer = QSpacerItem(20, 139, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.gridLayout.addItem(self.verticalSpacer, 2, 0, 1, 1)
 
         self.formLayout = QFormLayout()
         self.formLayout.setObjectName(u"formLayout")
@@ -84,10 +80,30 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.write_text_widegt)
 
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.verticalLayout_3 = QVBoxLayout()
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.auto_add_check_box = QCheckBox(self.centralwidget)
         self.auto_add_check_box.setObjectName(u"auto_add_check_box")
 
-        self.verticalLayout_2.addWidget(self.auto_add_check_box)
+        self.verticalLayout_3.addWidget(self.auto_add_check_box)
+
+        self.save_histry_file_check_box = QCheckBox(self.centralwidget)
+        self.save_histry_file_check_box.setObjectName(u"save_histry_file_check_box")
+
+        self.verticalLayout_3.addWidget(self.save_histry_file_check_box)
+
+
+        self.horizontalLayout_3.addLayout(self.verticalLayout_3)
+
+        self.textEdit = QTextEdit(self.centralwidget)
+        self.textEdit.setObjectName(u"textEdit")
+
+        self.horizontalLayout_3.addWidget(self.textEdit)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
@@ -113,12 +129,16 @@ class Ui_MainWindow(object):
         self.formLayout.setLayout(0, QFormLayout.FieldRole, self.verticalLayout_2)
 
 
-        self.gridLayout.addLayout(self.formLayout, 1, 0, 1, 1)
+        self.gridLayout.addLayout(self.formLayout, 1, 0, 1, 2)
+
+        self.verticalSpacer = QSpacerItem(20, 139, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer, 2, 1, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 692, 21))
+        self.menubar.setGeometry(QRect(0, 0, 734, 21))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -139,6 +159,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(accessibility)
         self.write_url_widegt.setPlainText(QCoreApplication.translate("MainWindow", u"https://h5.clewm.net/?url=qr61.cn%2FooCZ0Y%2Fq3TEwEl&hasredirect=1", None))
         self.auto_add_check_box.setText(QCoreApplication.translate("MainWindow", u"\u81ea\u52a8+1", None))
+        self.save_histry_file_check_box.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u5386\u53f2\u5230\u6587\u4ef6", None))
         self.write_button.setText(QCoreApplication.translate("MainWindow", u"\u5199\u5165", None))
         self.lock_button.setText(QCoreApplication.translate("MainWindow", u"\u9501\u5361", None))
         self.less_button.setText(QCoreApplication.translate("MainWindow", u"-1", None))
