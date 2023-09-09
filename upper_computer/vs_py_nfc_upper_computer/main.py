@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtCore import Qt
 
 
@@ -44,9 +44,28 @@ class MyMainWindow(QMainWindow):
 
     def Check_box_changed(self, state):
         if state == Qt.CheckState.Checked.value:
-            save_data_in_excel.Open_file(self)
-        
+            temp_file_addr = save_data_in_excel.Open_file(self)
+            # 清空数据
+            self.ui.file_save_addr_textEdit.clear()
+            self.save_file_addr = ""
 
+            if temp_file_addr:
+                self.save_file_addr = temp_file_addr
+                self.ui.file_save_addr_textEdit.setText(
+                    "当前历史记录文件:" + temp_file_addr
+                )
+            else:
+                self.ui.file_save_addr_textEdit.setText(
+                    "文件不存在或被占用"
+                )
+                # 提示错误:
+                dlg = QMessageBox(self)
+                dlg.setWindowTitle("错误")
+                dlg.setText("文件不存在或被占用")
+                dlg.exec()
+                # 恢复复选框非选中状态
+                self.ui.save_histry_file_check_box.setCheckState(Qt.CheckState.Unchecked)
+        
     process = ""
     def Read_button_clicked(self):
         if not self.process:
@@ -117,8 +136,6 @@ class MyMainWindow(QMainWindow):
             +"文本：" + text + "\n"
         )
 
-        
-
     def Write_button_clicked(self):
         if not self.process:
             return
@@ -144,8 +161,21 @@ class MyMainWindow(QMainWindow):
 
         print(input_data)
 
-        # 复选框选择，则自动加1
         if nfc_cmd_io.Write_card(self.process, input_data):
+            # 写入成功,如果需要保存历史则记录历史到表格中
+            if self.save_file_addr:
+                state = save_data_in_excel.Save_in_file(self.save_file_addr, text, url, input_data)
+                if not state:
+                    # 提示错误:
+                    dlg = QMessageBox(self)
+                    dlg.setWindowTitle("错误")
+                    dlg.setText("文件不存在或被占用")
+                    dlg.exec()
+                    # 后续自加操作不再进行
+                    return
+            else:
+                print("self.save_file_addr"+"为空")
+            # 复选框选择，则自动加1
             if self.ui.auto_add_check_box.isChecked():
                 text = self.ui.write_text_widegt.toPlainText()
                 if text:
@@ -168,6 +198,7 @@ class MyMainWindow(QMainWindow):
         if text:
             write_text = str(int(text) -1)
             self.ui.write_text_widegt.setText(write_text)
+
 
 def main():
     app = QApplication(sys.argv)

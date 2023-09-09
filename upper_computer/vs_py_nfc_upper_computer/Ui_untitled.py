@@ -97,10 +97,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3.addLayout(self.verticalLayout_3)
 
-        self.textEdit = QTextEdit(self.centralwidget)
-        self.textEdit.setObjectName(u"textEdit")
+        self.file_save_addr_textEdit = QTextEdit(self.centralwidget)
+        self.file_save_addr_textEdit.setObjectName(u"file_save_addr_textEdit")
 
-        self.horizontalLayout_3.addWidget(self.textEdit)
+        self.horizontalLayout_3.addWidget(self.file_save_addr_textEdit)
 
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)

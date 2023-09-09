@@ -118,7 +118,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QTextEdit" name="textEdit"/>
+           <widget class="QTextEdit" name="file_save_addr_textEdit"/>
           </item>
          </layout>
         </item>

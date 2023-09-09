@@ -1,29 +1,21 @@
-import enum
 import sys
 import os
 
 from Ui_file_select_widget import Ui_Dialog
-
 from PySide6.QtWidgets import (
     QApplication, 
     QWidget, 
     QFileDialog, 
     QGridLayout,
     QPushButton, 
-    QLabel,
-    QListWidget,
     QDialog,
-    QDialogButtonBox,
-    QVBoxLayout,
 )
-from PySide6.QtCore import Qt
 
+import openpyxl
 
-from pathlib import Path
 
 class CustomDialog(QDialog):
     run_path = ""
-    open_file = ""
     return_state = 0
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -61,8 +53,24 @@ class CustomDialog(QDialog):
         if file_path:
             try:
                 with open(file_path, 'w') as file:
-                    # 可以在这里写入文件内容
+                    # 文件新建,应该初始化文件
                     pass
+                # 由于excel文件有特定格式,直接创建,会导致格式有问题
+                # 删掉再创建
+                os.remove(file_path) 
+                # 创建一个新的工作簿对象
+                workbook = openpyxl.Workbook()
+                # 选择要写入数据的工作表
+                sheet = workbook.active
+                # 写入初始化数据,记录锚点的数据为B1,首次数据存储地点为A3开始
+                data_to_write = [
+                    ["程序历史记录锚点:", 3],
+                    ["序列号", "链接", "原始数据"],
+                ]
+                for row_data in data_to_write:
+                    sheet.append(row_data)
+                workbook.save(file_path)
+                    
                 print(f'文件已成功创建：{file_path}')
                 return file_path
             except Exception as e:
@@ -91,7 +99,41 @@ def Open_file(widegt):
             case 2:
                 return dialog_main.create_file()
 
+def Save_in_file(file_addr, txt = "错误", uri = "错误", byte = "错误"):
+    
+    try:
+        # 打开.xlsx文件
+        workbook = openpyxl.load_workbook(file_addr)
+        # 选择要读取数据的工作表
+        sheet = workbook['Sheet']  # 这里使用工作表的名称，你可以根据实际情况修改
+        # 读取到第一行数据,B1记录了最后写入的表格行号
+        history_data = sheet["B1"].value
+        
+        # # 从行对象中读取单元格的值
+        # history_row = row[1]
+        # 选择要写入数据的工作表
+        sheet = workbook.active
+        # 写入标题行（第一行）
+        #向excel中写入表头
+        
+        #向excel中写入对应的value
+        sheet.cell(row=history_data, column=1).value = txt
+        sheet.cell(row=history_data, column=2).value = uri
+        sheet.cell(row=history_data, column=3).value = byte
 
+        # 用来记录历史的锚点数据更新
+        history_data += 1
+        sheet["B1"] = history_data
+
+        # 保存文件
+        workbook.save(file_addr)
+        return  True
+        print(f'写入文件成功')
+    except Exception as e:
+        print(f'操作文件时发生错误：{e}')
+        return  False
+
+# 测试
 class MainWindow(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -104,19 +146,16 @@ class MainWindow(QWidget):
 
         # file selection
         file_browser_btn = QPushButton('Browse')
-        file_browser_btn.clicked.connect(self.open_file_dialog)
-
-        self.file_list = QListWidget(self)
-
-        layout.addWidget(QLabel('Files:'), 0, 0)
-        layout.addWidget(self.file_list, 1, 0)
+        file_browser_btn.clicked.connect(self.open_dialog)
         layout.addWidget(file_browser_btn, 2 ,0)
 
         self.show()
         
 
-    def open_file_dialog(self):
-        Open_file(self)
+    def open_dialog(self):
+        temp_file_addr = Open_file(self)
+        print(temp_file_addr)
+        # Save_in_file(temp_file_addr, "小伙子", "真", "帅")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
