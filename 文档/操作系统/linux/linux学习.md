@@ -88,6 +88,20 @@ yzq-linux@ubuntu:/etc/ssh$ ps -e|grep ssh
 
 # 一些命令
 
+## 不分页输出
+
+```
+--no-pager
+```
+
+如，在git中使用
+
+```
+git --no-pager diff
+```
+
+
+
 ## 系统相关
 
 ```
