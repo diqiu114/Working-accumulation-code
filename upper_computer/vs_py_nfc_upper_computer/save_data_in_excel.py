@@ -12,7 +12,8 @@ from PySide6.QtWidgets import (
 )
 
 import openpyxl
-
+import datetime
+# from time import strftime
 
 class CustomDialog(QDialog):
     run_path = ""
@@ -65,7 +66,7 @@ class CustomDialog(QDialog):
                 # 写入初始化数据,记录锚点的数据为B1,首次数据存储地点为A3开始
                 data_to_write = [
                     ["程序历史记录锚点:", 3],
-                    ["序列号", "链接", "原始数据"],
+                    ["写入时间", "序列号", "链接", "原始数据"],
                 ]
                 for row_data in data_to_write:
                     sheet.append(row_data)
@@ -113,13 +114,13 @@ def Save_in_file(file_addr, txt = "错误", uri = "错误", byte = "错误"):
         # history_row = row[1]
         # 选择要写入数据的工作表
         sheet = workbook.active
-        # 写入标题行（第一行）
-        #向excel中写入表头
-        
         #向excel中写入对应的value
-        sheet.cell(row=history_data, column=1).value = txt
-        sheet.cell(row=history_data, column=2).value = uri
-        sheet.cell(row=history_data, column=3).value = byte
+        # 获取当前时间
+        now=datetime.datetime.now()
+        sheet.cell(row=history_data, column=1).value = now.strftime("%Y-%m-%d %H:%M:%S")
+        sheet.cell(row=history_data, column=2).value = txt
+        sheet.cell(row=history_data, column=3).value = uri
+        sheet.cell(row=history_data, column=4).value = byte
 
         # 用来记录历史的锚点数据更新
         history_data += 1
@@ -155,7 +156,7 @@ class MainWindow(QWidget):
     def open_dialog(self):
         temp_file_addr = Open_file(self)
         print(temp_file_addr)
-        # Save_in_file(temp_file_addr, "小伙子", "真", "帅")
+        Save_in_file(temp_file_addr, "小伙子", "真", "帅")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

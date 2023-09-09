@@ -5,9 +5,9 @@ from PySide6.QtCore import Qt
 
 from Ui_untitled import Ui_MainWindow
 
+from qt_material import apply_stylesheet
 # from Ui_file_select_widget import Ui_MainWindow as Second_window
 
-from qt_material import apply_stylesheet
 
 
 import save_data_in_excel
