@@ -89,7 +89,6 @@ int board_init(void)
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
@@ -98,6 +97,7 @@ int board_init(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
+  rt_mq_recv
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */

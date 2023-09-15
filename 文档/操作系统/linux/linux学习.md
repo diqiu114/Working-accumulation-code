@@ -1,3 +1,34 @@
+## 使用nat，访问虚拟机ftp
+
+前提，虚拟机需要有：
+
+1. 安装ftp服务
+2. 若使用sftp，则需要安装了ssh服务
+
+教程
+
+1. 虚拟机和物理机能ping通
+
+2. 端口映射：找到虚拟机ip
+
+   1. ![image-20230911135713874](linux%E5%AD%A6%E4%B9%A0.assets/image-20230911135713874.png)
+
+   2. 管理员运行虚拟网络编辑器
+
+   3. 端口映射到虚拟机
+
+      ![image-20230911135820587](linux%E5%AD%A6%E4%B9%A0.assets/image-20230911135820587.png)
+
+   4. 找到本机ip
+
+      ![image-20230911135939920](linux%E5%AD%A6%E4%B9%A0.assets/image-20230911135939920.png)
+
+   5. 连接sftp
+
+      ![image-20230911140133851](linux%E5%AD%A6%E4%B9%A0.assets/image-20230911140133851.png)
+
+      
+
 关于采用**MobaXterm_Portable_v23.2**去连接ubutun的步骤
 
 首先得确定虚拟机linux和window是否连通
