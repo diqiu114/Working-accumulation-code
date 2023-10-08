@@ -11,3 +11,17 @@ index-url=https://pypi.tuna.tsinghua.edu.cn/simple
 trusted-host = pypi.tuna.tsinghua.edu.cn
 ```
 
+
+
+在安装idf过程中，取消安装后，再次打开vscode时，idf的插件打开时，会卡在获取版本信息这里，解决方式：
+
+找到vscode设置配置文件setting.json，比如：
+
+```
+C:\Users\YZQ\AppData\Roaming\Code\User\settings.json
+```
+
+删除下面这两项：
+
+    "http.proxySupport": "on",
+    "http.proxyStrictSSL": false,
