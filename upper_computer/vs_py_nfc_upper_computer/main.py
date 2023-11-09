@@ -1,14 +1,15 @@
+import os
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+import time
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QSystemTrayIcon, QMenu
 
+from PySide6.QtGui import QIcon, QAction
 
 from Ui_untitled import Ui_MainWindow
 
 from qt_material import apply_stylesheet
 # from Ui_file_select_widget import Ui_MainWindow as Second_window
-
-
 
 import save_data_in_excel
 
@@ -18,11 +19,15 @@ import ndef as ndef
 class MyMainWindow(QMainWindow):
     save_file_addr = ""
 
-    def __init__(self):
+    def __init__(self, run_path, app_name):
+        self.basedir = run_path
+        self.icon_resource = os.path.join(self.basedir, 'my_resource/nfc_blue.png')
+        self.app_name = app_name
+
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowTitle("PySide6 Main Window")
+        self.create_system_tray_icon()
 # class MyMainForm(QMainWindow, Ui_Form):
 #     def __init__(self, parent=None):
 #         super(MyMainForm, self).__init__(parent)
@@ -37,7 +42,16 @@ class MyMainWindow(QMainWindow):
         self.ui.save_histry_file_check_box.stateChanged.connect(self.Check_box_changed)
 
         # self.ui.auto_add_check_box.stateChanged.connect()
+    # 设置窗口名称、图标等等
+    def create_system_tray_icon(self):
+        self.setWindowTitle(self.app_name)
+        appIcon = QIcon(self.icon_resource)
+        self.setWindowIcon(appIcon)
 
+        tray_icon = QSystemTrayIcon(self)
+        tray_icon.setIcon(QIcon(self.icon_resource))  # 设置任务栏图标
+        tray_icon.show()
+        
     def __del__(self):
         if self.process:
             nfc_cmd_io.Close_device(self.process)
@@ -201,12 +215,23 @@ class MyMainWindow(QMainWindow):
 
 
 def main():
+    app_name = "nfc tool"
+    try:
+        from ctypes import windll  # Only exists on Windows.
+        windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_name)
+        time.sleep(1)
+    except ImportError:
+        pass
+
+
     app = QApplication(sys.argv)
-    main_window = MyMainWindow()
+
+    main_window = MyMainWindow(os.path.dirname(__file__), app_name)
     
     apply_stylesheet(app, theme='light_red.xml')
     
     main_window.show()
+    main_window.create_system_tray_icon()
     
     sys.exit(app.exec())
 
