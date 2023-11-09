@@ -65,7 +65,7 @@ class CustomDialog(QDialog):
                 sheet = workbook.active
                 # 写入初始化数据,记录锚点的数据为B1,首次数据存储地点为A3开始
                 data_to_write = [
-                    ["程序历史记录锚点:", 3],
+                    ["当前写入数据的起始行号:", 3, "备注：手动更改起始行号，可以指定软件从哪行开始写入"],
                     ["写入时间", "序列号", "链接", "原始数据"],
                 ]
                 for row_data in data_to_write:
