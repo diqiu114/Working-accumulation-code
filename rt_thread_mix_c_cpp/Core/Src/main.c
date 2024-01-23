@@ -97,7 +97,6 @@ int board_init(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-  rt_mq_recv
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -132,6 +131,15 @@ static void SoftTimerCb(void* param)
 
 int main()
 {
+    
+    float temp = 10.1;
+    float temp1 = 0.0;
+    int temp2 = 15;
+    int temp3 = 20;
+    temp2 = temp;
+    temp3 = *((int*)(&temp));
+    temp1 = *((int*)(&temp));
+    temp1 = *((float*)(&temp));
     rt_thread_mdelay(500);
     rt_kprintf("rt main hello!\r\n");
 

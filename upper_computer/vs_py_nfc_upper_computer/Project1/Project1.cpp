@@ -12,7 +12,7 @@
 
 using namespace std;
 
-//#define   // DEBUG_OUT 
+//#define   DEBUG_OUT cout
 #define   CMD_OUT   std::cout
 
 #define RETURN_FALSE_FLAGE      "_false_"
@@ -65,7 +65,7 @@ int Connect_nfc_card(HID_DEVICE device)
         // DEBUG_OUT << "卡信息:";
         // DEBUG_OUT << hex << serch << endl;
     } else {
-        // DEBUG_OUT << "TyA_Anticollision" << endl;
+        // DEBUG_OUT << "TyA_Request" << endl;
         // DEBUG_OUT << "失败原因：" << status << endl;
         return status;
     }
@@ -86,22 +86,22 @@ int Connect_nfc_card(HID_DEVICE device)
         return status;
     }
 
-    // 获取卡信息
-    BYTE buffer[20] = {0};
-    BYTE buffer_lenth = 0;
-    //status = TyA_Anticollision(g_hDevice, 0,  buffer, &buffer_lenth);
-    status = TyA_UL_GetVersion(device, buffer, &buffer_lenth);
-    if(status==0) {
-        // DEBUG_OUT << "获取到版本信息为：";
-        for (int i = 0; i < buffer_lenth; i++) {
-            // DEBUG_OUT << hex << (int)buffer[i] << " ";
-        }
-        // DEBUG_OUT << endl;
-    } else {
-        // DEBUG_OUT << "TyA_NTAG_GetVersion 失败" << endl;
-        // DEBUG_OUT << "失败原因：" << status << endl;
-        return status;
-    }
+    //// 获取卡信息
+    //BYTE buffer[20] = {0};
+    //BYTE buffer_lenth = 0;
+    ////status = TyA_Anticollision(g_hDevice, 0,  buffer, &buffer_lenth);
+    //status = TyA_UL_GetVersion(device, buffer, &buffer_lenth);
+    //if(status==0) {
+    //    // DEBUG_OUT << "获取到版本信息为：";
+    //    for (int i = 0; i < buffer_lenth; i++) {
+    //        // DEBUG_OUT << hex << (int)buffer[i] << " ";
+    //    }
+    //    // DEBUG_OUT << endl;
+    //} else {
+    //    // DEBUG_OUT << "TyA_UL_GetVersion 失败" << endl;
+    //    // DEBUG_OUT << "失败原因：" << status << endl;
+    //    return status;
+    //}
 
     return 0;
 }
@@ -307,13 +307,13 @@ int Lock_card(HID_DEVICE device)
     status = TyA_UL_Write(device, 2, read_buffer_static);
     for(int cnt = 0; cnt < sizeof(read_buffer_dynamic) / sizeof(*read_buffer_dynamic); cnt++) {
         read_buffer_dynamic[cnt] = 0xff;
-        //DEBUG_OUT << (int)read_buffer_dynamic[cnt];
+        //// DEBUG_OUT << (int)read_buffer_dynamic[cnt];
     }
     if(status==0) {
         status = TyA_UL_Write(device, 40, read_buffer_dynamic);
     }
     // 实验证明，调用函数TyA_UL_Write对锁卡标位置位写时，尽管已经锁卡，但是函数并不会返回错误
-    //DEBUG_OUT << status << endl;
+    //// DEBUG_OUT << status << endl;
     return status;
 }
 

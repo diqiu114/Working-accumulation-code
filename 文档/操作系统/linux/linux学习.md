@@ -107,7 +107,15 @@ yzq-linux@ubuntu:/etc/ssh$ ps -e|grep ssh
 
 后续怎么使用MobaXterm_Portable连接linux按部就班的按照韦东山的教程来即可
 
+# 虚拟网络管理器恢复默认值后不见了怎么办
 
+手动添加，形如：
+
+![image-20231211110647851](linux%E5%AD%A6%E4%B9%A0.assets/image-20231211110647851.png)
+
+子网地址随便设
+
+然后就可以了
 
 
 

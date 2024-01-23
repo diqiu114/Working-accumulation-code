@@ -238,49 +238,131 @@ c++中会产生几种临时对象：
    }
    ```
 
-   ## const关键字
-   
-   ## `const` 成员函数
-   
-   声明带 **`const`** 关键字的成员函数将指定该函数是一个“只读”函数，它不会修改为其调用该函数的对象。 常量成员函数不能修改任何非静态数据成员或调用不是常量的任何成员函数。 若要声明常量成员函数，请在参数列表的右括号后放置 **`const`** 关键字。 声明和定义中都需要 **`const`** 关键字。
-   
-   注解：这里就是说，const出现在函数声明后，形如这样：int getMonth() const{}，表明函数体内的东西都是不可变更的。
-   
-   ```cpp
-   // constant_member_function.cpp
-   class Date
-   {
-   public:
-      Date( int mn, int dy, int yr );
-      int getMonth() const;     // A read-only function
-      void setMonth( int mn );   // A write function; can't be const
-   private:
-      int month;
-   };
-   
-   int Date::getMonth() const
-   {
-      return month;        // Doesn't modify anything
-   }
-   void Date::setMonth( int mn )
-   {
-      month = mn;          // Modifies data member
-   }
-   int main()
-   {
-      Date MyDate( 7, 4, 1998 );
-      const Date BirthDate( 1, 18, 1953 );
-      MyDate.setMonth( 4 );    // Okay
-      BirthDate.getMonth();    // Okay
-      BirthDate.setMonth( 4 ); // C2662 Error
-   }
+
+## const关键字
+
+## `const` 成员函数
+
+声明带 **`const`** 关键字的成员函数将指定该函数是一个“只读”函数，它不会修改为其调用该函数的对象。 常量成员函数不能修改任何非静态数据成员或调用不是常量的任何成员函数。 若要声明常量成员函数，请在参数列表的右括号后放置 **`const`** 关键字。 声明和定义中都需要 **`const`** 关键字。
+
+注解：这里就是说，const出现在函数声明后，形如这样：int getMonth() const{}，表明函数体内的东西都是不可变更的。
+
+```cpp
+// constant_member_function.cpp
+class Date
+{
+public:
+   Date( int mn, int dy, int yr );
+   int getMonth() const;     // A read-only function
+   void setMonth( int mn );   // A write function; can't be const
+private:
+   int month;
+};
+
+int Date::getMonth() const
+{
+   return month;        // Doesn't modify anything
+}
+void Date::setMonth( int mn )
+{
+   month = mn;          // Modifies data member
+}
+int main()
+{
+   Date MyDate( 7, 4, 1998 );
+   const Date BirthDate( 1, 18, 1953 );
+   MyDate.setMonth( 4 );    // Okay
+   BirthDate.getMonth();    // Okay
+   BirthDate.setMonth( 4 ); // C2662 Error
+}
+```
+
+
+
+### typename 
+
+**`typename`** 向编译器提供未知标识符为类型的提示。 在模板参数列表中，它用于指定类型参数
+
+## 引用
+
+### 引用不能干的事情
+
+引用不能等于引用，这种实际上是两个被引用者的赋值
+
+```c++
+int x = 10;
+int y = 20;
+
+int& num1 = x;
+int& num2 = y;
+
+num1 = num2; // 实际上是x = y;
+```
+
+### 引用和指针的关系
+
+1. 引用本身是不可见的，也就是引用不可以被取地址。
+
+   ```
+   int& *p; // 非法的
+   int* &p; // 合法， 这个可以理解为，从做到右依次修饰，修饰一次，就将修饰完的当成整体再被后续修饰修饰，最后用一个名称表示，照这个解读就是：int类型的指针是引用，用符号表示就是((int*)&)p
    ```
 
-## 引用和指针的区别
+   
 
-指针是用一个变量存了另一个变量的地址
+## 向上\下造型
 
-引用本质上还是原变量，只是用另外一个名称进行了替代
+从这里得到了新的东西，就是对象里没有函数，只有成员变量，这说明这会比c更省内存？
+
+相当于C语言中的不同结构体copy，不是类型转换，因为原有的数据类型没丢（数据结构没变）
+
+这里还有一点，当b引用为A类后，再访问相同的函数时，A类的printf就不再隐藏了，这a2调用的就是A类的printf了
+
+```c++
+class A
+{
+public:
+	A();
+	~A();
+	int num;
+	void printf() {
+		cout << "A" << endl;
+	}
+private:
+
+};
+
+class B : public A
+{
+public:
+	B();
+	~B();
+	void print() {
+		cout << "B" << endl;
+	}
+private:
+
+};
+
+A a;
+B b;
+A& a2 = b;
+a2.printf();
+```
+
+## 多态性
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## lamabda表达式
 
@@ -326,8 +408,3 @@ T minimum(const T& lhs, const T& rhs)
 ```
 
 在编译中，编译器会推导T类型，然后再把模板中的t替换掉
-
-### typename 
-
-**`typename`** 向编译器提供未知标识符为类型的提示。 在模板参数列表中，它用于指定类型参数
-

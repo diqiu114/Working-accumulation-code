@@ -23,3 +23,44 @@
 2. 构建工具
 
    使用cmack作为构建系统，所以包含源码和头文件都需要编写cmakelists
+
+
+
+
+
+# 问题点：
+
+## 基于ubuntu 22.04下烧录问题：
+
+问题点，提示：
+
+```
+A fatal error occurred: Could not open /dev/ttyUSB0, the port is busy or doesn't exist.
+```
+
+解决办法：
+
+原因：
+只有root用户和属于dialout组的用户会有读写权限
+
+解决：
+方法一：
+该方法重启就会失效
+
+```
+sudo chmod -R 777 /dev/ttyUSB0
+```
+
+方法二：
+永久性方案：
+把自己的用户加入到dialout组：
+
+```
+sudo usermod -aG dialout user	//user替换为自己的用户名
+reboot							//必须要重启一下才会生效
+```
+
+————————————————
+版权声明：本文为CSDN博主「JavonPeng」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/p1279030826/article/details/111691205
+
