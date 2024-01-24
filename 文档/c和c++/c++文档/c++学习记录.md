@@ -270,11 +270,9 @@ inline void Test::print()
 }
 ```
 
-## 
-
 ## const关键字
 
-## `const` 成员函数
+## const成员函数
 
 声明带 **`const`** 关键字的成员函数将指定该函数是一个“只读”函数，它不会修改为其调用该函数的对象。 常量成员函数不能修改任何非静态数据成员或调用不是常量的任何成员函数。 若要声明常量成员函数，请在参数列表的右括号后放置 **`const`** 关键字。 声明和定义中都需要 **`const`** 关键字。C、C++这里是变量会分配内存，不是常数，但是下面这个情况是存在代码区
 
@@ -384,6 +382,84 @@ private:
 };
 ```
 
+### 引用+const
+
+### 表示不可以通过引用修改它的值
+
+```
+int a;
+const int& b = a;
+// b = 10; // 非法，不能修改const 引用
+```
+
+还有一种形式，这种写不写无所谓，因为引用本身就不可变更，这里是等效
+
+```
+int a;
+int& const b = a; // == int& b = a;
+```
+
+### 在函数参数列表中做运算
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+class B
+{
+public:
+	B();
+	~B();
+	void func()
+	{
+		cout << __FUNCTION__ << endl;
+	}
+	void func2()
+	{
+		cout << __FUNCTION__ << endl;
+	}
+	const int& func(const int& num)
+	{
+		cout << __FUNCTION__ << "const int& num" << endl;
+		cout << num << endl;
+		return num;
+	}
+	void func(int& num)
+	{
+		cout << __FUNCTION__ << "int& num" << endl;
+		cout << num << endl;
+	}
+private:
+
+};
+
+B::B()
+{
+}
+
+B::~B()
+{
+}
+
+int main()
+{
+	B b;
+
+	int num = 20;
+	
+	b.func(num);
+    // num*3后的值交给了匿名的变量，匿名变量是临时的变量
+    // 返回时返回的也是匿名临时变量，这里做返回会有风险
+	const int& test = b.func(num * 3);
+	cout << "return ref" << test << endl;
+	cout << "num val:" << num << endl;
+	/* = cout << "return ref:" << b.func(num * 3) << endl;*/
+	return 0;
+}
+
+```
+
 
 
 ## 向上\下造型
@@ -457,7 +533,7 @@ class B : public A
 public:
 	B();
 	~B();
-	void func()
+	void func()	override	// override（复写）关键字用来给编译器严格检查
 	{
 		cout << __FUNCTION__ << endl;
 	}
