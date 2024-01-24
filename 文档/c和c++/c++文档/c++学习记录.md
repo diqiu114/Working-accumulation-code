@@ -238,14 +238,64 @@ c++中会产生几种临时对象：
    }
    ```
 
+## inline
+
+### inline适合的地方：
+
+1. 只有几行的函数。三四十行的就不适合了
+2. 频繁调用的函数。。。
+
+成员函数也是内联函数，成员函数即：body写在类里面的函数
+
+eg：
+
+```C++
+class Test {
+	void print() {
+		int num = 10;
+	}
+}
+```
+
+还有这种方式也可以被编译为inline，函数直接写在类下面并用inline修饰
+
+```c++
+class Test {
+	void print();
+}
+
+inline void Test::print()
+{
+	int num = 0;
+}
+```
+
+## 
 
 ## const关键字
 
 ## `const` 成员函数
 
-声明带 **`const`** 关键字的成员函数将指定该函数是一个“只读”函数，它不会修改为其调用该函数的对象。 常量成员函数不能修改任何非静态数据成员或调用不是常量的任何成员函数。 若要声明常量成员函数，请在参数列表的右括号后放置 **`const`** 关键字。 声明和定义中都需要 **`const`** 关键字。
+声明带 **`const`** 关键字的成员函数将指定该函数是一个“只读”函数，它不会修改为其调用该函数的对象。 常量成员函数不能修改任何非静态数据成员或调用不是常量的任何成员函数。 若要声明常量成员函数，请在参数列表的右括号后放置 **`const`** 关键字。 声明和定义中都需要 **`const`** 关键字。C、C++这里是变量会分配内存，不是常数，但是下面这个情况是存在代码区
 
-注解：这里就是说，const出现在函数声明后，形如这样：int getMonth() const{}，表明函数体内的东西都是不可变更的。
+```
+char* string = "test";
+const char* string2 = "test2";
+```
+
+注解：这里就是说，const出现在函数声明后，形如这样：
+
+```
+void func() const {}
+```
+
+表明函数体内的东西都是不可变更的，其实等于，即this不可变：
+
+```
+void func(const class_obj* this) {}
+```
+
+
 
 ```cpp
 // constant_member_function.cpp
@@ -308,7 +358,33 @@ num1 = num2; // 实际上是x = y;
    int* &p; // 合法， 这个可以理解为，从做到右依次修饰，修饰一次，就将修饰完的当成整体再被后续修饰修饰，最后用一个名称表示，照这个解读就是：int类型的指针是引用，用符号表示就是((int*)&)p
    ```
 
-   
+
+### 类的成员是refrencese
+
+没办法初始化，只能声明
+
+必须在构造函数的initial list中进行初始化
+
+```c++
+class A
+{
+public:
+    A(int& num) : num(num)
+    {
+
+    }
+    A();
+	~A();
+    void change_val(int& num)
+    {
+        num = this->num;
+    }
+private:
+    int& num;
+};
+```
+
+
 
 ## 向上\下造型
 
@@ -352,17 +428,148 @@ a2.printf();
 
 ## 多态性
 
+在c++中多态性由虚函数实现，形如：
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+class A
+{
+public:
+	A();
+	virtual ~A();
+	virtual void func()
+	{
+		cout << __FUNCTION__ << endl;
+	}
+	void func2()
+	{
+		cout << __FUNCTION__ << endl;
+	}
+private:
+
+};
+
+class B : public A
+{
+public:
+	B();
+	~B();
+	void func()
+	{
+		cout << __FUNCTION__ << endl;
+	}
+	void func2()
+	{
+		cout << __FUNCTION__ << endl;
+	}
+private:
+
+};
+
+B::B()
+{
+}
+
+B::~B()
+{
+}
+
+A::A()
+{
+}
+
+A::~A()
+{
+}
+
+
+int main()
+{
+	A a;
+	B b;
+	A& c = b;
+	c.func();	// 调用B::func
+	c.func2();	// 调用A::func2
+	return 0;
+}
+
+```
 
 
 
+当类中出现了虚函数，那 么析构函数也应该为虚函数，因为不知道子类什么override了父类，如果父类析构函数不是虚函数，那么当子类override后的函数就会没有析构掉 
 
+### 对虚函数表的使用洛阳铲挖掘
 
+数据结构（但是析构函数是虚函数时可能不是，虚析构函数没用裸指针验真出来）：
 
+![image-20240123164056745](c++学习记录.assets/image-20240123164056745.png)
 
+```c++
+#include <iostream>
 
+using namespace std;
 
+class Base {
+public:
+    // 基类的虚析构函数
+    ~Base() {
+        std::cout << "Base Destructor\n";
+    }
+    virtual void test()
+    {
+        cout << __FUNCTION__ << endl;
+    }
+};
 
+class Derived : public Base {
+public:
+    // 派生类的虚析构函数
+    ~Derived(){
+        std::cout << "Derived Destructor\n";
+    }
+    int num = 10;
+    void test() override
+    {
+        cout << __FUNCTION__ << endl;
+    }
+};
 
+typedef void (*p_func)();
+typedef void (Derived::* p_func2)();
+
+int main() {
+    // 使用基类指针指向派生类对象
+    Base* ptr = new Derived();
+    cout << sizeof(Base) << endl;
+    cout << sizeof(Derived) << endl;
+
+    int* p = (int*)ptr;
+    printf("%p\r\n", p);
+    // 定位到虚函数表的地址
+    int virtual_table_addr = *((int*)(*p));
+    printf("virtual_table_addr %x\r\n", virtual_table_addr);
+
+    p_func func_p;
+    // 转化为函数指针
+    func_p = (p_func)(virtual_table_addr);
+    printf("func_p %p\r\n", func_p);
+    printf("*func_p %x\r\n", *func_p);
+    func_p();
+
+    // 删除基类指针，会调用正确的析构函数
+    delete ptr;
+
+    return 0;
+}
+```
+
+### 注意事项
+
+1. 基类有虚函数重载的情况，子类需要将所有的函数复写，否则基类函数会被隐藏（只有c++有函数名隐藏）
 
 ## lamabda表达式
 
