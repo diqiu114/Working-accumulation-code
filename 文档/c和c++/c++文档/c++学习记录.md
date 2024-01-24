@@ -1,10 +1,62 @@
 c++经过大量的版本更替，越来越现代化，应当学习现代c++
 
-c++相比于c多了许多特性：
+c++相比于c多了许多特性
+
+
+
+## 类的声明
+
+```c++
+class A
+{
+public:
+	A();
+	A(int num, int num2);
+	A(int num);
+	~A();
+	int num;
+	int num2;
+private:
+
+};
+
+A::A()
+{
+}
+
+A::A(int num, int num2)
+{
+	this->num = num;
+	this->num2 = num2;
+}
+
+A::A(int num)
+{
+	this->num = num;
+}
+
+A::~A()
+{
+}
+
+int main()
+{
+	A a(10, 20); // 方式1
+	cout << a.num << endl;
+	cout << a.num2 << endl;
+
+	A a2 = 30; // 方式2，尽管很怪异，这里是c++的隐式转换
+	cout << a2.num << endl;
+}
+```
+
+
 
 ## 指针
 
-现代c++提倡使用智能指针unique_ptr，智能会自动销毁
+现代c++提倡使用智能指针unique_ptr，智能会自动销毁，
+
+注意智能指针有传染性，一处用处处要用。
 
 示例：
 
@@ -441,7 +493,7 @@ B::B()
 B::~B()
 {
 }
-
+ 
 int main()
 {
 	B b;
@@ -646,6 +698,129 @@ int main() {
 ### 注意事项
 
 1. 基类有虚函数重载的情况，子类需要将所有的函数复写，否则基类函数会被隐藏（只有c++有函数名隐藏）
+
+## 拷贝构造
+
+初始化和赋值在c和c++非常不同。
+
+代码中没给拷贝构造是，编译器会给，会拷贝每一个成员变量，拷贝对象时不是字节对字节拷贝，而是成员对成员的拷贝，当类中含类，拷贝时会调用调用类自己的拷贝
+
+### 注意
+
+1. 类中含有指针的时候，指针拷贝结果就是，指针指向同一片地址，引用也一样
+
+2. 拷贝构造函数传参直接是对象时，会造成递归拷贝，然后出不来了
+
+   ```
+   class A
+   {
+   public:
+   	A();
+   	A(A a)	// 递归的调用
+   	{
+   	
+   	}
+   	~A();
+   }
+   ```
+
+   
+
+### 例子：
+
+```c++
+#include <iostream>
+using namespace std;
+
+static int class_creat_cnt;
+
+#define CNT_ADD \
+cout << __FUNCTION__ << endl;\
+class_creat_cnt++;\
+cout << class_creat_cnt << endl;
+
+#define CNT_SUB \
+cout << __FUNCTION__ << endl;\
+class_creat_cnt--;\
+cout << class_creat_cnt << endl;
+
+
+class A
+{
+public:
+	A();
+	~A();
+	A get_class(A a)
+	{
+		return a;
+	}
+private:
+
+};
+
+A::A()
+{
+	CNT_ADD
+}
+
+A::~A()
+{
+	CNT_SUB
+}
+
+class B
+{
+public:
+	B();
+	~B();
+	B(const B& obj);	// ！！！ 拷贝构造函数
+private:
+
+};
+
+B::B()
+{
+	CNT_ADD
+}
+
+B::~B()
+{
+	CNT_SUB
+}
+
+B::B(const B& obj)
+{
+	CNT_ADD
+}
+
+int main()
+{
+	cout << "====== test1 =======" << endl;
+	{
+		A a;
+		A a2 = a;
+	} // 测试结果，构造一次，析构两次
+
+	
+	cout << "======== test2 =======" << endl;
+	{
+		class_creat_cnt = 0;
+		A a3;
+		A a4 = a3.get_class(a3);
+	} // 测试结果，构造一次，析构两次
+
+	cout << "======== test3 =======" << endl;
+	{
+		class_creat_cnt = 0;
+		B b1;
+		B a2 = b1;
+	} // 由于有拷贝构造函数，构造两次，析构两次
+
+	return 0;
+}
+```
+
+
 
 ## lamabda表达式
 
