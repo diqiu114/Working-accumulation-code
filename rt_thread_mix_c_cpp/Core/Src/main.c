@@ -129,19 +129,36 @@ static void SoftTimerCb(void* param)
   }
 }
 
+typedef struct 
+{
+  int num;
+  rt_list_t list;
+  char* str;
+} test_rt_list_t;
+
+
 int main()
 {
-    
-    float temp = 10.1;
-    float temp1 = 0.0;
-    int temp2 = 15;
-    int temp3 = 20;
-    temp2 = temp;
-    temp3 = *((int*)(&temp));
-    temp1 = *((int*)(&temp));
-    temp1 = *((float*)(&temp));
-    rt_thread_mdelay(500);
-    rt_kprintf("rt main hello!\r\n");
+  rt_list_t list_one;
+  static test_rt_list_t test = {
+    .num = 10,
+    .str = "test"
+  };
+  static test_rt_list_t test2 = {
+    .num = 20,
+    .str = "test2"
+  };
+  rt_list_init(&list_one);
+  rt_list_insert_after(&list_one, &test.list);
+  rt_list_insert_after(&list_one, &test2.list);
+  test_rt_list_t* p_test;
+  rt_list_for_each_entry(p_test, &list_one, list)
+  {
+    rt_kprintf("num = %d, str = %s \r\n", p_test->num, p_test->str);
+  }
+
+  rt_thread_mdelay(500);
+  rt_kprintf("rt main hello!\r\n");
 
   rt_thread_t thread;
   thread = rt_thread_create("1", one_thread, RT_NULL, 256, 0, 10);
@@ -152,6 +169,8 @@ int main()
 
   rt_timer_t timerTest = rt_timer_create("soft timer", SoftTimerCb, RT_NULL, rt_tick_from_millisecond(500), RT_TIMER_FLAG_SOFT_TIMER | RT_TIMER_FLAG_PERIODIC);
   rt_timer_start(timerTest);
+
+
 
 
 //     while(1) {

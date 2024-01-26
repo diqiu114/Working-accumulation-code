@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>-AT32F403AVGT7</Device>
           <Vendor>ArteryTek</Vendor>
-          <PackID>ArteryTek.AT32F403A_407_DFP.2.1.1</PackID>
+          <PackID>ArteryTek.AT32F403A_407_DFP.2.1.7</PackID>
           <Cpu>IRAM(0x20000000,0x38000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
@@ -335,7 +335,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--gun</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
               <IncludePath>../Core/Inc;../RT-Thread;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../Middlewares/Third_Party/RealThread_RTOS/include/;../Middlewares/Third_Party/RealThread_RTOS/bsp/_template/cubemx_config</IncludePath>
