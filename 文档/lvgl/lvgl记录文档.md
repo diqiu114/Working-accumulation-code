@@ -19,11 +19,36 @@ typedef struct {
 
 ### 设计原理、使用方法概述
 
+链表结构图示：
+
+![image-20240126113859154](lvgl记录文档.assets/image-20240126113859154.png)
+
 ### 基本使用步骤
 
 1. 初始化节点信息
 2. 实例化节点，即：向节点插入数据
 3. 使用节点，即：读写节点payload的数据
+
+例子：
+
+```c
+#define _LV_LL_READ(list, i) for(i = _lv_ll_get_head(list); i != NULL; i = _lv_ll_get_next(list, i))
+// 要一个用来记录链表头的对象
+static lv_ll_t src_mgmt_ll_base;
+// 链表的userdata
+static scr_mgmt_t* src_mgmt_now;
+// 初始化节点记录对象，lvgl的链表需要有一个东西记录
+_lv_ll_init(&src_mgmt_ll_base, sizeof(scr_mgmt_t));
+// 读取链表
+scr_mgmt_t* diabel_load_scr = NULL;
+// 挂进链表
+LV_ASSERT_NULL(data);
+_LV_LL_READ(&src_mgmt_now->ll_disabel_load_scr, diabel_load_scr) {
+	// 这里diabel_load_scr就是从链表里从head到tail拿出来的指针
+}
+```
+
+
 
 ### 原理解析
 
@@ -37,7 +62,7 @@ typedef struct {
     */
    void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
    {
-       ll_p->head = NULL;77
+       ll_p->head = NULL;
        ll_p->tail = NULL;
    #ifdef LV_ARCH_64
        /*Round the size up to 8*/
@@ -48,14 +73,14 @@ typedef struct {
    #endif
    
        ll_p->n_size = node_size;
-   }
+   }   
    ```
 
-   此处，初始化双链表指针、获取节点payload大小（uint32_t node_size）并对该大小内存对齐处理，64位处理器8字节对齐，其他的4字节对齐
+   **此处，初始化双链表指针、获取节点payload大小（uint32_t node_size）并对该大小内存对齐处理，64位处理器8字节对齐，其他的4字节对齐**
 
 2. 实例化节点
 
-   链表通过节点对象记录节点信息，每添加一个新节点，对新节点实例化时，会产生一下数据结构：
+   链表通过节点对象记录节点信息，每添加一个新节点，对新节点实例化时，会产生以下数据结构：
 
 ![image-20240125103733203](lvgl记录文档.assets/image-20240125103733203.png)
 
@@ -121,10 +146,12 @@ void * _lv_ll_ins_tail(lv_ll_t * ll_p)
         // 后一个挂NULL，前一个挂
         node_set_next(ll_p, n_new, NULL);       /*No next after the new tail*/
         node_set_prev(ll_p, n_new, ll_p->tail); /*The prev. before new is the old tail*/
-        if(ll_p->tail != NULL) {                /*If there is old tail then the new comes after it*/
+        if(ll_p->tail != NULL) {                /*老链表尾挂了东西，就把这个东西的->tail更新*/
+            // 上一个的->tail更新为n_new地址
+            // 这里展开其实是(*(ll_p->tail))再偏移到内存中节点信息部分的->tail，并写入n_new
             node_set_next(ll_p, ll_p->tail, n_new);
         }
-
+        // 刷新链表记录者，这个链表记录者，遍历的时候会用到，这个东西记录了链表头
         ll_p->tail = n_new;      /*Set the new tail in the dsc.*/
         if(ll_p->head == NULL) { /*If there is no head (1. node) set the head too*/
             ll_p->head = n_new;
@@ -134,6 +161,3 @@ void * _lv_ll_ins_tail(lv_ll_t * ll_p)
     return n_new;
 }
 ```
-
-
-
