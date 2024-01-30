@@ -345,6 +345,29 @@ void func() const {}
 void func(const class_obj* this) {}
 ```
 
+关于其他几种const修饰的位置（ram、rom），这里可以看出全局（静态 也是全局）东西const后会被编译进rom，局部的东西const会被编译进ram，这说明，局部const只是编译阶段会检查，但是运行起来还是可以修改值，但是全局的const修改会程序奔溃，对于单片机，这中const位于flash
+
+```
+static const int  const5 = 1;
+static const int const6[] = { 23, 3 };
+const int  const7 = 1;
+const int const8[] = { 23, 3 };
+int main()
+{
+    static const int  const1 = 1;
+    static const int const2[] = { 23, 3 };
+    const int const3 = 3;
+    const int const4[] = { 3, 5 };
+
+    printf("1:%x 2:%x 3:%x 4:%x 5:%x 6:%x 7:%x 8:%x\r\n", &const1, const2, &const3, const4, &const5, const6, &const7, const8);
+    return 1;
+}
+
+// vs studio打印：1:9db1e0 2:9db1e4 3:f3fe74 4:f3fe64 5:9db1c8 6:9db1cc 7:9db1d4 8:9db1d8
+// at32打印：     1:8003740 2:8003744 3:20000734 4:2000072c 5:8003720 6:8003724 7:800372c 8:8003730
+// at32使用gunc99和c99编译出来的结果一样，这里
+```
+
 
 
 ```cpp
