@@ -100,7 +100,7 @@ def Open_file(widegt):
             case 2:
                 return dialog_main.create_file()
 
-def Save_in_file(file_addr, txt = "错误", uri = "错误", byte = "错误"):
+def Save_in_file(file_addr, txt = "无数据", uri = "无数据", byte = "无数据"):
     
     try:
         # 打开.xlsx文件

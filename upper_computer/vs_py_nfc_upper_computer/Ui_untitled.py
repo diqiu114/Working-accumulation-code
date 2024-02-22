@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'untitled.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.2
+## Created by: Qt User Interface Compiler version 6.6.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">https://h5.clewm.net/?url=qr61.cn%2FooCZ0Y%2Fq3TEwEl&amp;hasredirect=1</p></body></html>", None))
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u5e8f\u5217\u53f7", None))
         self.auto_add_check_box.setText(QCoreApplication.translate("MainWindow", u"\u5e8f\u5217\u53f7\u81ea\u52a8+1", None))
         self.save_histry_file_check_box.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u5199\u5361\u5386\u53f2", None))

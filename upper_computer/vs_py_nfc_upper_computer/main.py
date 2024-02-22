@@ -150,30 +150,53 @@ class MyMainWindow(QMainWindow):
             +"文本：" + text + "\n"
         )
 
+    # 写入的链接准备
+    def add_url(self, to_list):
+        if to_list==None:
+            return
+        # 从url文本框获取url
+        url = self.ui.write_url_widegt.toPlainText()
+        url_len = len(url)
+        if url_len > 0:
+            print("获取到链接：" + url)
+            record = ndef.UriRecord(url)
+            to_list.append(record)
+        else:
+            print("===== 链接为空 =====")
+        return url
+        
+    def add_text(self, to_list):
+        if to_list==None:
+            return
+        # 从text文本框获取text
+        text = self.ui.write_text_widegt.toPlainText()
+        if len(text):
+            print("获取到文本：" + text)
+            # 编码ndef消息记录
+            record = ndef.TextRecord(text)
+            to_list.append(record)
+        else:
+            print("===== 文本为空 =====")
+        return text
+
     def Write_button_clicked(self):
         if not self.process:
             return
         print("Write_button_clicked点击")
-        # 从url文本框获取url
-        url = self.ui.write_url_widegt.toPlainText()
-        print("获取到链接：" + url)
-        # 从text文本框获取text
-        text = self.ui.write_text_widegt.toPlainText()
-        print("获取到文本：" + text)
-        # 编码
-#     # 编码ndef消息记录
-        record1 = ndef.UriRecord(url)
-        record2 = ndef.TextRecord(text)
-        message = [record1, record2]
-        buf = b"".join((ndef.message_encoder(message)))
+        message_list = []
+        url = self.add_url(message_list)
+        text = self.add_text(message_list)
+        buf = b"".join((ndef.message_encoder(message_list)))
         lenth = len(bytes.fromhex(buf.hex()))
         print("长度为：" + str(lenth))
-
-        write_hex_str = "03"+ hex(lenth)[2:] + buf.hex()
-
+        # print("ndef编码的到的字符串：", end=" ")
+        # print(buf.hex())
+        # format中02x表示以小写方式输出数据长度为2，不足补0，用hex(lenth)[2:]切片
+        # 会出现lenth小于0x0f时，0被吞掉
+        # "03"描述了后续TLV（类型、长度、值）的格式
+        write_hex_str = "03"+ format(lenth, "02x") + buf.hex()
         input_data = write_hex_str + "\n"  # 换行符是为了模拟用户按下回车
-
-        print(input_data)
+        print("编码结束，得到字符串：" + input_data)
 
         if nfc_cmd_io.Write_card(self.process, input_data):
             # 写入成功,如果需要保存历史则记录历史到表格中
