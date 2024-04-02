@@ -726,7 +726,47 @@ int main() {
 
 初始化和赋值在c和c++非常不同。
 
-代码中没给拷贝构造是，编译器会给，会拷贝每一个成员变量，拷贝对象时不是字节对字节拷贝，而是成员对成员的拷贝，当类中含类，拷贝时会调用调用类自己的拷贝
+```
+A a;
+A b = a; // 初始化
+b = a; 	// 赋值
+```
+
+为什么会出现这种差异？
+
+c++中构造函数只有一个参数时，=号相当于()号，这里参数多了就不行，所以就会出现以下：
+
+```
+#include <iostream>
+
+using namespace std;
+
+class my_class {
+public:
+	my_class() {}
+	my_class(my_class& data) { data.print(); }
+	virtual ~my_class() {}
+
+	void print(void) { cout << __FUNCTION__ << endl; }
+	int num;
+};
+
+int main()
+{
+	my_class a;
+	my_class b = a;	// !!!相当于my_class b(a);
+	
+	return 0;
+}
+```
+
+代码中没给拷贝构造是，编译器会给，会拷贝每一个成员变量，拷贝对象时不是字节对字节拷贝，而是成员对成员的拷贝，当类中含类，拷贝时会调用调用类自己的拷贝（一般编译器不会允许自己拷贝自己，因为会无线递归）
+
+```
+my_class(my_class data) { data.print(); }
+```
+
+
 
 ### 注意
 
