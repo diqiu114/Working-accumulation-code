@@ -45,3 +45,30 @@ static void _uctskUSART3(void){
 }
 ```
 
+2. 
+
+![image-20240412092621677](接手韩工项目后原本存在的bug.assets/image-20240412092621677.png)
+
+源码
+
+```
+static GPIO_TypeDef null_GPIO_TypeDef;  // 为了不该变原有程序，用此变量做填充
+GPIO_DefineForAllBANDS_TypeDef  BandGPIO_Define[]={  // 
+	//IO初始化的排序有要求，上行在前，下行在后，然后是GPS衰减器的LE控制IO,上下行链路的排序要和枚举变量Band_里的顺序保持一致，   其它IO初始化在最后，	
+    {{GPIOA,GPIO_PIN_15,OUTPUT},{GPIOB, GPIO_PIN_7,OUTPUT},{&null_GPIO_TypeDef,  GPIO_PIN_12,OUTPUT},OS_TRUE}, //698  UP		
+    {{GPIOB, GPIO_PIN_3,OUTPUT},{GPIOE, GPIO_PIN_1,OUTPUT},{&null_GPIO_TypeDef,  GPIO_PIN_13,OUTPUT},OS_TRUE},		//776  UP  		
+    {{GPIOB, GPIO_PIN_4,OUTPUT},{GPIOE, GPIO_PIN_3,OUTPUT},{&null_GPIO_TypeDef, GPIO_PIN_14,OUTPUT},OS_TRUE},		//824  UP
+    {{GPIOB, GPIO_PIN_5,OUTPUT},{GPIOC, GPIO_PIN_8,OUTPUT},{&null_GPIO_TypeDef, GPIO_PIN_15,OUTPUT},OS_TRUE},		//1710  UP
+    {{GPIOB, GPIO_PIN_6,OUTPUT},{GPIOD, GPIO_PIN_3,OUTPUT},{&null_GPIO_TypeDef, GPIO_PIN_15,OUTPUT},OS_TRUE},		//1850  UP
+    {{GPIOB, GPIO_PIN_1,OUTPUT},{GPIOE, GPIO_PIN_5,OUTPUT},{&null_GPIO_TypeDef, GPIO_PIN_11,OUTPUT}, OS_TRUE},	//1930  DOWN	
+    {{GPIOE, GPIO_PIN_9,OUTPUT},{GPIOE, GPIO_PIN_6,OUTPUT},{&null_GPIO_TypeDef, GPIO_PIN_12,OUTPUT}, OS_TRUE},	//2110	DOWN	
+    {{GPIOD, GPIO_PIN_7,OUTPUT},{GPIOE, GPIO_PIN_4,OUTPUT},{&null_GPIO_TypeDef, GPIO_PIN_10,OUTPUT}, OS_FALSE},	//869		DOWN
+    {{GPIOA, GPIO_PIN_4,OUTPUT},{GPIOE, GPIO_PIN_2,OUTPUT},{&null_GPIO_TypeDef,  GPIO_PIN_9,OUTPUT}, OS_FALSE},			//728		DOWN
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	{{GPIOA, GPIO_PIN_8,OUTPUT},{GPIOC, GPIO_PIN_9,OUTPUT},{GPIOD, GPIO_PIN_13,OUTPUT},OS_TRUE},					//ATT_CLK  ATT_DATA		WDI	
+	{{GPIOC, GPIO_PIN_6,OUTPUT},{GPIOC, GPIO_PIN_7,OUTPUT},{GPIOD, GPIO_PIN_13,OUTPUT},OS_TRUE},					//VOMDE   VBP					WDI
+};
+
+```
+
