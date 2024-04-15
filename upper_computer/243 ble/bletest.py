@@ -1,7 +1,22 @@
-from network import Bluetooth
+import asyncio
+from bleak import BleakScanner
 
-bluetooth = Bluetooth()
-bluetooth.start_scan(-1)    # start scanning with no timeout
+async def main():
+    stop_event = asyncio.Event()
 
-while True:
-    print(bluetooth.get_adv())
+    # TODO: add something that calls stop_event.set()
+
+    def callback(device, advertising_data):
+        # TODO: do something with incoming data
+        pass
+
+    async with BleakScanner(callback) as scanner:
+        ...
+        # Important! Wait for an event to trigger stop, otherwise scanner
+        # will stop immediately.
+        await stop_event.wait()
+
+    # scanner stops when block exits
+    ...
+
+asyncio.run(main())
