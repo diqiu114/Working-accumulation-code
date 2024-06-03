@@ -1,3 +1,17 @@
+重启网络服务
+
+```
+sudo systemctl restart networking
+```
+
+更新列表
+
+```
+sudo apt update
+```
+
+
+
 # 教程地址
 
 野火：https://doc.embedfire.com/linux/imx6/base/zh/latest/index.html
@@ -203,6 +217,10 @@ id
 mkdir /home/embedfire/workdir
 ```
 
+```
+mkdir ~/mnt
+```
+
 **exportfs命令更新配置**
 
 ```
@@ -232,7 +250,7 @@ sudo apt install nfs-common -y
 在开发板上执行“showmount -e +“**NFS**服务器IP””命令。**注意在不同网络环境下，NFS服务器IP可能不一样，以实际情况为准。**
 
 ```
-showmount -e 192.168.0.219
+showmount -e 192.168.7.107
 ```
 
 如下图：
@@ -247,7 +265,15 @@ sudo mount -t nfs 192.168.0.219:/home/embedfire/workdir /mnt
 ```
 
 ```
-sudo mount -t nfs 192.168.7.107:/home/yzq-linux/Desktop/mnt /mnt
+sudo mount -t nfs 192.168.7.107:/home/yzq-linux/mnt ~/mnt
+```
+
+```
+sudo cp ~/mnt/imx6ull-mmc-npi.dtb /usr/lib/linux-image-4.19.35-imx6/
+```
+
+```
+ sudo ./setup_ip.sh
 ```
 
 以上命令使用的各个参数如下：
@@ -273,6 +299,22 @@ sudo umount /mnt
 使用该命令时以要取消挂载的目录作为参数即可，没有输出表示执行正常。如果 在当前挂载的目录进行umount操作，会提示“device is busy”。建议取消挂 载时，先切换到家目录“~”，在进行umount操作。
 
 # 一些命令
+
+### linux中>>和>区别
+
+重定向输出，会清空之前内容
+
+```
+>
+```
+
+追加内容
+
+```
+>>
+```
+
+
 
 ## 不分页输出
 
@@ -1423,3 +1465,70 @@ A 类地址每个网络可以容纳多大 1600 万的主机，但哪个组织会
 - 文件系统的设计侧重于数据的存储和管理，而虚拟文件系统的设计侧重于提供一个统一的接口，使得不同文件系统能够协同工作。
 
 虚拟文件系统之所以称为“虚拟”，是因为它并不是一个实际存在的文件系统，而是一个在操作系统内核中的抽象概念。它的作用是虚拟化底层文件系统的细节，为用户和应用程序提供一个统一的文件访问接口。
+
+
+
+
+
+# 内存分配
+
+## kmalloc	kzalloc
+
+小于128kb内存时使用kmalloc，kzalloc和kmalloc差不多，不过用内存会先清零
+
+分配机制：
+
+kmalloc的处理方式是：内核先为其分配一系列不同大小（32B、64B、128B、… 、128KB）的内存池，当需要分配内存时，系统会分配大于等于所需内存的最小一个内存池给它。即kmalloc分配的内存，最小为32字节，最大为128KB。
+
+
+
+
+
+# pinctrl子系统
+
+几个查bug技巧，gpio子系统提示找不到设备：-2 检查pinctrl是否没有错误
+
+```
+dmesg | grep pinctrl
+```
+
+提示冲突：-16
+
+```
+gpioinfo
+```
+
+
+
+只管理pin脚（这个点还不是很明白）通常是配合gpio等其他子系统使用
+
+添加pinctrl信息，在iomuxc节点下添加（这里MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03中有snv所以是iomuxc_snvs节点 没有就是iomuxc节点）：
+
+```
+&iomuxc_snvs {
+……
+myled_for_gpio_subsys: myled_for_gpio_subsys{
+fsl,pins = <
+MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03 0x000110A0
+>;
+};
+```
+
+设备节点信息，给gpio子系统用
+
+```
+myled {
+    compatible = "100ask,leddrv";
+    pinctrl-names = "default";
+    pinctrl-0 = <&myled_for_gpio_subsys>;
+    led-gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;
+};
+```
+
+如果驱动程序使用，注意xxx-gpios：
+
+```
+/* 4.1 设备树中定义有: led-gpios=<...>;	*/
+    led_gpio = gpiod_get(&pdev->dev, "my_led", 0);
+```
+
