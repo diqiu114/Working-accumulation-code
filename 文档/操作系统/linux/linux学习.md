@@ -1532,3 +1532,6 @@ myled {
     led_gpio = gpiod_get(&pdev->dev, "my_led", 0);
 ```
 
+# linux对中断的处理
+
+arm crotx系列单片机中断由nvic处理，硬件支持功能多，软件简单些；linux中就是硬件中断简单，只触发下中断，其他基本上都有软件处理了
