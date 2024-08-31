@@ -1470,7 +1470,7 @@ await只能在异步函数中使用，表示等待一个事件的结果，有两
 
 2. 获取异步产生的结果
 
-测试源码：
+测试事件循环启动时机：
 
 ```python
 import asyncio
@@ -1518,6 +1518,37 @@ print("main thread:run_loop, now time:" + time.strftime('%X'))
 # 不启动事件循环
 asyncio.run(main(False))
 ```
+
+测试简单的异步机制
+
+```
+import asyncio
+import time
+
+async def say_after(delay, what):
+    # print(what)
+    await asyncio.sleep(delay)
+    print(what, f"run at {time.strftime('%X')}")
+    return "hi"
+
+async def main():
+    task1 = asyncio.create_task(
+        say_after(5, 'hello'))
+
+    task2 = asyncio.create_task(
+        say_after(2, 'world'))
+    
+    print(f"started at {time.strftime('%X')}")
+
+    # 启动事件循环
+    print(await task1)
+    print(await task2)
+    print(f"finished at {time.strftime('%X')}")
+
+asyncio.run(main())
+```
+
+
 
 # 高级编程部分
 
