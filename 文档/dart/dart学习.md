@@ -1,5 +1,25 @@
 # 语法部分
 
+## 运算符号
+
+### ??
+
+在 Dart 编程语言中，`??` 被称为空合并运算符（null-coalescing operator）。它的作用是：如果左侧的表达式不为 `null`，则返回左侧的值；否则，返回右侧的值。
+
+**用法示例：**
+
+```
+dart复制代码void main() {
+  String? username;
+  String displayName = username ?? '默认用户名';
+  print(displayName); // 输出：默认用户名
+}
+```
+
+在上述代码中，`username` 可能为 `null`。使用 `??` 运算符，可以为 `displayName` 提供一个默认值，防止出现 `null` 值导致的错误。
+
+
+
 ## **Map**：
 
 示例：
@@ -38,4 +58,109 @@ print(myVariable); // Output: [1, 2, 3]
 ```
 
 在上面的例子中，`myVariable` 是一个 `dynamic` 类型的变量，它先后存储了一个整数、一个字符串和一个列表。这样的灵活性可以在一些特定场景下派上用场，但同时也要小心潜在的类型错误，因为在编译时不会有类型检查的帮助。在大多数情况下，建议使用更具体的类型来声明变量，以便在编译时能够发现潜在的类型错误。
+
+
+
+## 函数
+
+### 可选参数
+
+参数使用“[]”包括:
+
+```
+int func(int num, [int num2, int num3])
+{
+	return 10;
+}
+```
+
+### 参数为函数：
+
+```
+void fun_print()
+{
+  print("hello");
+}
+
+void func(pfunc)
+{
+  pfunc();
+}
+
+void main()
+{
+  func(fun_print);
+}
+```
+
+### 闭包
+
+```
+void main() {
+  func(){
+    var num = 10;
+    return (){
+      num++;
+      print(num);
+    };
+  }
+  var f = func();
+  f();
+  f();
+  f();
+}
+
+```
+
+作用：（闭包其实就是缩小版的类）在var f定义时，实例化产生，func函数中的num一并实例化，后续f变量都没有被释放，所以，num也没有释放，这里达到了和c里面的静态变量的作用，f释放后，num函数一并被释放。
+
+## 类
+
+### 构造函数
+
+```dart
+
+class Test{
+  // 构造函数
+  Test(){
+    print("默认构造函数");
+  }
+  Test.print_info(){
+    print("命名构造函数");
+  }
+}
+
+void main()
+{
+  var test = Test.print_info();
+}
+```
+
+### 变成模块
+
+```dart
+/**
+ * dart的类中的私有
+ * 前提：只有在单独的文件中才有效果
+ */
+class Test{
+  // 构造函数
+  Test(){
+    print("默认构造函数");
+  }
+  Test.print_info(){
+    print("命名构造函数");
+  }
+  void _print()
+  {
+      print("私有方法");
+  }
+}
+void main()
+{
+  var test = Test();
+  // 同一文件中还是能够使用私有方法
+  test._print();
+}
+```
 
