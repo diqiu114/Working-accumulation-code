@@ -101,16 +101,49 @@ print(myVariable); // Output: [1, 2, 3]
 
 在上面的例子中，`myVariable` 是一个 `dynamic` 类型的变量，它先后存储了一个整数、一个字符串和一个列表。这样的灵活性可以在一些特定场景下派上用场，但同时也要小心潜在的类型错误，因为在编译时不会有类型检查的帮助。在大多数情况下，建议使用更具体的类型来声明变量，以便在编译时能够发现潜在的类型错误。
 
+## late
+
+1）显式声明一个非空的变量，但不初始化
+
+如下，_temperature如果不加late关键字，类实例化时此值是不确定的，无法通过静态检查，加上late关键字可以通过静态检查，但由此会带来运行时风险。
+
+```
+// Using null safety:
+class Coffee {
+  late String _temperature;
+
+  void heat() { _temperature = 'hot'; }
+  void chill() { _temperature = 'iced'; }
+
+  String serve() => _temperature + ' coffee';
+}
+
+main() {
+  var coffee = Coffee();
+  coffee.heat();
+  coffee.serve();
+}
+```
+
+2）延迟初始化变量
+
+这个作用看起来和第一点矛盾，实际上是同一个意思。看下面的例子，temperature变量看起来是在声明时就被初始化了，但因为late关键字的存在，如果temperature这个变量没有被使用的话，_readThermometer()这个函数不会被调用，temperature也就不会被初始化了。
+
+```
+late String temperature = _readThermometer(); // Lazily initialized.
+```
+
 
 
 ## 函数
 
 ### 可选参数
 
-参数使用“[]”包括:
+参数使用“{}”包括:
 
 ```
-int func(int num, [int num2, int num3])
+// required表示必须填参，否则要初始化
+int func(int num, {required int num2, required int num3})
 {
 	return 10;
 }
@@ -155,6 +188,93 @@ void main() {
 ```
 
 作用：（闭包其实就是缩小版的类）在var f定义时，实例化产生，func函数中的num一并实例化，后续f变量都没有被释放，所以，num也没有释放，这里达到了和c里面的静态变量的作用，f释放后，num函数一并被释放。
+
+### 常量构造函数
+
+zq总结：两个作用
+
+1. 编译器初始化好对象在rom中
+2. 内存共享
+
+ 在Dart语言中，常量构造函数（`const` constructor）用于创建编译时常量。这种机制的目的是在编译期间分配和初始化对象，从而在运行时提高效率和减少内存占用。这里是一些关于常量构造函数和它们在内存中的处理方式的关键点：
+
+1. **编译时常量**：当使用常量构造函数创建对象时，该对象在编译时被创建并存储在内存中的常量区域。这意味着每个常量表达式都会在编译时求值，结果存储在程序的常量池中。
+2. **内存共享**：如果多个地方引用相同的常量构造函数生成的对象（带有完全相同的参数），Dart会确保所有引用都指向内存中的同一个对象实例。这样做减少了内存的使用，因为不会为相同的常量数据创建多个副本。
+3. **不可变性**：通过常量构造函数创建的对象是不可变的。这意味着对象一旦被创建，其状态就不能更改。这种不可变性进一步确保了常量对象可以安全地共享，而不需要担心数据竞争或并发修改。
+4. **优化和性能**：由于常量对象在编译时就已经确定，并且存储在专门的内存区域，它们的访问速度通常比普通对象更快。这对于需要频繁访问的静态数据特别有用。
+
+举一个简单的例子来说明常量构造函数的使用：
+
+```
+dart复制代码class ImmutablePoint {
+  final int x;
+  final int y;
+  const ImmutablePoint(this.x, this.y);
+}
+
+void main() {
+  var p1 = const ImmutablePoint(0, 0);
+  var p2 = const ImmutablePoint(0, 0);
+  print(identical(p1, p2));  // 输出：true
+}
+```
+
+在这个例子中，`ImmutablePoint`的两个实例`p1`和`p2`都是通过相同的参数创建的。由于它们是常量构造函数创建的，Dart确保`p1`和`p2`实际上是同一个内存中的对象。`identical()`函数用于验证这一点，它检查两个引用是否指向相同的对象。
+
+#### 在flutter中
+
+在Flutter中，`const` 关键字用于定义编译时常量，这意味着常量的值在编译时就已经确定，并且在整个程序运行期间不会改变。使用 `const` 可以提高Flutter应用的性能，因为它帮助Flutter框架优化资源的分配和使用。以下是在Flutter中使用`const`的一些关键点和场景：
+
+1. **构造函数中的`const`**： 当一个类具有不变的状态时，你可以创建常量构造函数。在Flutter开发中，这通常用于`Widget`的构造函数，以确保当相同参数的widget被创建时，能够复用已有的widget实例，而不是创建一个新的实例。
+
+   ```
+   dart复制代码class MyImmutableWidget extends StatelessWidget {
+     final String title;
+   
+     const MyImmutableWidget({Key? key, required this.title}) : super(key: key);
+   
+     @override
+     Widget build(BuildContext context) {
+       return Text(title);
+     }
+   }
+   ```
+
+   在这个例子中，如果`MyImmutableWidget`使用相同的`title`被多次构造，Flutter会在渲染树中复用同一个widget实例。
+
+2. **优化性能**： 使用`const`可以减少构建时间和内存使用。如果一个widget在整个应用的生命周期内保持不变，你应该使用`const`构造函数。这是因为`const`构造的widget不需要在每次构建时都重新计算，从而节省资源。
+
+   ```
+   dart复制代码@override
+   Widget build(BuildContext context) {
+     return const Scaffold(
+       appBar: AppBar(
+         title: Text('Constant AppBar'),
+       ),
+       body: Center(
+         child: Text('Hello, world!'),
+       ),
+     );
+   }
+   ```
+
+   在这里，`Scaffold`、`AppBar`和`Text`都使用了`const`，所以如果这些widget的构造参数没有变化，它们将不会在每次`build`调用时重新构造。
+
+3. **`const`与`final`的区别**：
+
+   - `const`定义的是编译时常量，必须在声明时就赋值。
+   - `final`定义的变量只能赋值一次，但赋值时机可以是运行时。这意味着`final`变量的值可以是动态计算出来的。
+
+4. **在集合中使用`const`**： 在定义不变的列表、映射或集合时，使用`const`可以确保这些集合在编译时就已经创建好，避免了运行时的修改和重新分配资源。
+
+   ```
+   dart复制代码void main() {
+     const myList = [1, 2, 3];
+     const myMap = {'a': 1, 'b': 2};
+   }
+   ```
+
+使用`const`能有效提高Flutter应用的性能，特别是在构建大量静态或重复内容的UI时。如果你想了解更多关于`const`的细节或如何在具体项目中使用，可以随时提问！
 
 ## 类
 
@@ -483,4 +603,117 @@ void main() {
 }
 
 ```
+
+## 泛型
+
+```
+
+// 泛型抽象类
+import 'dart:async';
+
+abstract class Test<T> {
+  T get_val();
+}
+/**此处Test<T>的<>里的类型使用于限定Test2的<T>类型的
+ * 例如为Test<String>时，Test2的T就只能为String了
+ * 但是此处用的时Test2<T>表示为泛型T，不做限定，和
+ * extends Test效果一样
+ */
+// 泛型类
+class Test2<T> extends Test<T> {
+  T val;
+  /**以泛型初始化的变量，必须要在初始化列表中进行初始化，
+   * 在函数中初始化会报错，错误示范：
+   * Test2(T info) {
+   *    val = info;
+   * }
+   */
+  Test2(T info) :val = info;
+  @override
+  get_val() {
+    return val;
+  }
+}
+
+class MyBase extends Object
+{
+  ret()
+  {
+    return this.toString();
+  }
+}
+
+// 限制参数化类型，这里限定了泛型T必须为Object或者Object子类
+class Test3<T extends Object>{
+  T val;
+  Test3(this.val);
+  T ret_val()
+  {
+    return val;
+  }
+}
+
+// 泛型函数
+A genericity_func_test<A>(info)
+{
+  return info;
+}
+
+void main()
+{
+  // 无校验的泛型
+  var test2 = genericity_func_test("test");
+  // 带校验的泛型
+  var test3 = genericity_func_test<String>("test3");
+  // 报错
+  // var test3 = genericity_func_test<String>(10);
+  print(test3);
+  print(test2);
+  var test4 = Test2("test4");
+  print(test4.get_val());
+  var test5 = MyBase();
+  var test6 = Test3(test5);
+  print(test6.ret_val());
+} 
+
+```
+
+## 库的导入
+
+```
+// 重命名，防止库冲突
+import "dart:ffi" as test_html;
+// 只引用库中部分方法，下面表明了只能用max方法
+import "dart:math" show max;
+// 隐藏
+import "dart:math" hide min;
+
+void main()
+{
+  print(max(10, 20));
+  // 报错，因为只引用了max方法
+  // print(min(30, 1));
+}
+```
+
+## 空安全
+
+### ？可空类型
+
+```
+int? a = 12;
+a = null;
+```
+
+### 空断言！
+
+```
+  String? temp = "sdfsdf";
+  temp = null;
+  print(temp!);
+```
+
+
+
+## 异步
 
