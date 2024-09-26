@@ -498,3 +498,18 @@ If you are on Windows: try adding firewall exceptions to your Android Studio.
 网络问题、手机问题导致大量问题
 
 网络问题（上代理）一次不成功多试几次就行
+
+# 遇到的问题
+
+## window ble
+
+有的包在windows平台下面使用时会编译出一个Visual Studio 工程，然后通过Visual Studio 生成一些东西，但是有时候Visual Studio 版本不匹配就会有很多问题，注意报错。
+
+## Flutter windows build: Nuget is not installed
+
+使用一下安装：
+
+```
+winget install Microsoft.NuGet
+```
+
