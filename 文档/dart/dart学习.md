@@ -717,3 +717,167 @@ a = null;
 
 ## 异步
 
+### async/await
+
+函数描述用async，返回了一个Future
+
+```
+import 'dart:async';
+
+Future<String> test1(String str) async
+{
+  return Future.delayed(Duration(seconds: 2), ()=>str);
+}
+
+void task() async
+{
+  print(await test1("task1"));
+}
+
+void task2() async
+{
+  print(await test1("task2"));
+}
+
+void task3() async
+{
+  print(await test1("task3"));
+  print(await test1("task3"));
+}
+
+void task4() async
+{
+  var future1 = test1("task4");
+  var future2 = test1("task4");
+  // 相比task3，实现了两个future同时执行的效果，task3中第一个await会阻塞第二个
+  var results = await Future.wait([future1, future2]);
+  print(results);
+}
+
+void main()
+{
+  task();
+  task2();
+  task3();
+  task4();
+}
+
+```
+
+### stream
+
+函数使用async*修饰，返回一个Stream
+
+#### 单订阅流
+
+```
+import 'dart:async';
+
+bool USE_TEST_THROW = false;
+
+// 创建一个 Stream，每隔一秒发出一个递增的整数
+Stream<int> numberStream() async* {
+  int number = 1;
+  while (true) {
+    await Future.delayed(Duration(seconds: 1));
+    if(USE_TEST_THROW) {
+      yield number++;
+      if(number > 5) {
+        var obj = Object();
+        throw obj;
+      }
+    }
+  }
+}
+
+void main() {
+  var stream = numberStream();
+  // 监听 Stream
+  var subscription = stream.listen(
+    (number) => print('Received: $number'),
+    onError: (error) => print('Error: $error'),
+    // 流结束或者抛出异常后都会触发onDone，但是主从退出，即cancel不会触发
+    onDone: () => print('Stream completed'),
+    cancelOnError: false,
+  );
+
+  // 在 10 秒后取消订阅
+  Future.delayed(Duration(seconds: 10), () {
+    subscription.cancel();
+    print('Subscription canceled');
+  });
+}
+```
+
+使用await for
+
+```
+import 'dart:async';
+
+Stream<String> logStream() async* {
+  List<String> logs = ["Start", "Loading", "Complete"];
+  for (var log in logs) {
+    await Future.delayed(Duration(seconds: 1));
+    yield log;
+  }
+}
+
+Future<void> main() async {
+  await for (var log in logStream()) {
+    print('Log: $log');
+  }
+}
+```
+
+
+
+#### 广播流
+
+```
+import 'dart:async';
+
+// 创建一个广播 Stream
+Stream<int> createBroadcastStream() {
+  var controller = StreamController<int>.broadcast();
+  int number = 0;
+
+  // 每秒增加一个数字，并将其添加到 Stream
+  Timer.periodic(Duration(seconds: 1), (Timer t) {
+    /**sink 是一个用于向 Stream 中添加数据的接口。
+     * sink.add() 方法是用来将数据发送到 Stream 中，
+     * 这样任何监听这个 Stream 的监听器都可以接收到这些数据。
+     */
+    controller.sink.add(number++);
+    if (number > 10) { // 当数字大于 10 时停止添加
+      controller.close();
+      t.cancel();
+    }
+  });
+
+  return controller.stream;
+}
+
+void main() {
+  var stream = createBroadcastStream();
+
+  // 第一个监听器
+  var listen1 =  stream.listen(
+    (number) => print('Listener 1: $number'),
+    onDone: () => print('Listener 1 done'),
+  );
+
+  // 第二个监听器，开始于稍后时间
+  var listen2;
+  Future.delayed(Duration(seconds: 5), () {
+    listen2 = stream.listen(
+      (number) => print('Listener 2: $number'),
+      onDone: () => print('Listener 2 done'),
+    );
+    // 此时第二个监听器才被创建出来
+    print(listen2);
+  });
+  print(listen1);
+  print(listen2);
+}
+```
+
