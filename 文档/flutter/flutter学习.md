@@ -499,6 +499,25 @@ If you are on Windows: try adding firewall exceptions to your Android Studio.
 
 网络问题（上代理）一次不成功多试几次就行
 
+# 发布
+
+### 构建一个 APK
+
+[#](https://docs.flutter.cn/deployment/android#build-an-apk)
+
+虽然 app bundle 比 APKs 更被推荐使用，但是有一些 Store 目前还不支持 app bundle方式。这种情况下，要为各种目标 ABI (Application Binary Interface) 分别构建发布的 APK 文件。
+
+如果你完成签名步骤，APK 就被签名了。这时你也许想要 [混淆你的 Dart 代码](https://docs.flutter.cn/deployment/obfuscate) 以加大反编译难度。混淆你的代码需要在构建时添加一些参数。
+
+使用如下命令：
+
+1. 输入命令 `cd [project]`。
+
+2. Run `flutter build apk --split-per-abi`.
+
+   运行 `flutter build apk --split-per-abi`
+   （`flutter build` 默认带有 `--release` 参数。）
+
 # 遇到的问题
 
 ## window ble
