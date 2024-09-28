@@ -12,22 +12,28 @@ class HomePageSub extends StatefulWidget {
 
 class _HomePageSubState extends State<HomePageSub> {
   var ble_scan_result = [];
-
+  var is_scanning = false;
   void refresh() {
     setState(() {});
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     UniversalBle.onScanResult = (result) {
+      // print(ble_scan_result);
       for (var val in ble_scan_result) {
         if (val.deviceId == result.deviceId) {
           return;
         }
       }
       ble_scan_result.add(result);
+      refresh();
     };
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
         RawMaterialButton(
@@ -40,29 +46,40 @@ class _HomePageSubState extends State<HomePageSub> {
           textStyle: const TextStyle(color: Colors.white),
           child: const Text('Push'),
           onPressed: () {
+            if (is_scanning) {
+              return;
+            }
+            is_scanning = true;
             UniversalBle.startScan();
+            ble_scan_result.clear(); 
+            refresh();
             var timer = Timer(Duration(seconds: 2), () {
               UniversalBle.stopScan();
-              for (var val in ble_scan_result) {
-                print(val);
-              }
+              // for (var val in ble_scan_result) {
+              //   print(val);
+              // }
               print("stop");
-              refresh();
+              // 结束扫描后不要允许马上又发起扫描
+              Timer(Duration(seconds: 1), () {
+                is_scanning = false;
+              });
             });
           },
         ),
-        SizedBox(
-          height: 200,
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 5),
-            children: ble_scan_result
-                .map((color) => Container(
-                      alignment: Alignment.center,
-                      width: 100,
-                      height: 50,
-                      child: Text(color.toString()),
-                    ))
-                .toList(),
+        Expanded(
+          child: SizedBox(
+            // height: 200,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              children: ble_scan_result
+                  .map((obj) => Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
+                        // child: Text(obj.toString()),
+                        child: Text("${obj.runtimeType}"),
+                      ))
+                  .toList(),
+            ),
           ),
         ),
       ],
