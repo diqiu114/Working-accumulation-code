@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:universal_ble/universal_ble.dart';
@@ -23,6 +26,8 @@ class _HomePageSubState extends State<HomePageSub> {
   List<BleDevice> ble_scan_result = [];
   var is_scanning = false;
   BleDevice? device_connecting;
+  BleService? service;
+  BleCharacteristic? chart;
   void refresh() {
     setState(() {});
   }
@@ -31,10 +36,15 @@ class _HomePageSubState extends State<HomePageSub> {
     device_connecting = device;
     // Get current connection state
     // Can be connected, disconnected, connecting or disconnecting
-    BleConnectionState connectionState = await device.connectionState;
-    print("connectionState:$connectionState");
-    var chart = await UniversalBle.discoverServices(device.deviceId);
-    print("chart:$chart");
+    await device.connectionState;
+  }
+
+  void connet(BleDevice dev) async {
+    await UniversalBle.connect(dev.deviceId);
+  }
+
+  void dis_connet(BleDevice dev) async {
+    await UniversalBle.disconnect(dev.deviceId);
   }
 
   @override
@@ -51,10 +61,35 @@ class _HomePageSubState extends State<HomePageSub> {
       refresh();
     };
 
-    // Get connection/disconnection updates
     UniversalBle.onConnectionChange = (String deviceId, bool isConnected) {
       debugPrint('OnConnectionChange $deviceId, $isConnected');
+      if (isConnected) {
+        () async {
+          List<BleService> services =
+              await UniversalBle.discoverServices(deviceId);
+          for (var service in services) {
+            // debugPrint('\nble sevice:{$service}');
+            for (var chart in service.characteristics) {
+              if (chart.uuid == "0000ff02-0000-1000-8000-00805f9b34fb") {
+                this.chart = chart;
+                this.service = service;
+                // print("chart ok");
+              }
+            }
+          }
+        }(); // 注意这里的调用括号
+      }
     };
+  }
+
+  void write_ble(String str) async {
+    var send_val = Uint8List.fromList(utf8.encode(str));
+    await UniversalBle.writeValue(
+        this.device_connecting!.deviceId,
+        this.service!.uuid,
+        this.chart!.uuid,
+        send_val,
+        BleOutputProperty.withResponse);
   }
 
   @override
@@ -62,51 +97,76 @@ class _HomePageSubState extends State<HomePageSub> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment:
+              MainAxisAlignment.center, // 也可以使用 spaceBetween 或 spaceAround
           children: [
-            RawMaterialButton(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15))),
-              elevation: 0,
-              highlightElevation: 0,
-              fillColor: Colors.blue,
-              splashColor: Colors.orange,
-              textStyle: const TextStyle(color: Colors.white),
-              child: const Text('扫描设备'),
-              onPressed: () {
-                if (is_scanning) {
-                  return;
-                }
-                is_scanning = true;
-                UniversalBle.startScan();
-                ble_scan_result.clear();
-                refresh();
-                var timer = Timer(Duration(seconds: 2), () {
-                  UniversalBle.stopScan();
-                  // for (var val in ble_scan_result) {
-                  //   print(val);
-                  // }
-                  print("stop");
-                  // 结束扫描后不要允许马上又发起扫描
-                  Timer(Duration(seconds: 1), () {
-                    is_scanning = false;
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: RawMaterialButton(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
+                elevation: 0,
+                highlightElevation: 0,
+                fillColor: Colors.blue,
+                splashColor: Colors.orange,
+                textStyle: const TextStyle(color: Colors.white),
+                child: const Text('扫描设备'),
+                onPressed: () {
+                  if (is_scanning) {
+                    return;
+                  }
+                  is_scanning = true;
+                  UniversalBle.startScan();
+                  ble_scan_result.clear();
+                  refresh();
+                  var timer = Timer(Duration(seconds: 2), () {
+                    UniversalBle.stopScan();
+                    // for (var val in ble_scan_result) {
+                    //   print(val);
+                    // }
+                    print("stop");
+                    // 结束扫描后不要允许马上又发起扫描
+                    Timer(Duration(seconds: 1), () {
+                      is_scanning = false;
+                    });
                   });
-                });
-              },
+                },
+              ),
             ),
-            RawMaterialButton(
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(15))),
-              elevation: 0,
-              highlightElevation: 0,
-              fillColor: Colors.blue,
-              splashColor: Colors.orange,
-              textStyle: const TextStyle(color: Colors.white),
-              child: const Text('断开设备'),
-              onPressed: () {
-                if(device_connecting?.deviceId != null) {
-                  UniversalBle.disconnect(device_connecting!.deviceId);
-                }
-              },
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: RawMaterialButton(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
+                elevation: 0,
+                highlightElevation: 0,
+                fillColor: Colors.blue,
+                splashColor: Colors.orange,
+                textStyle: const TextStyle(color: Colors.white),
+                child: const Text('断开设备'),
+                onPressed: () {
+                  if (device_connecting?.deviceId != null) {
+                    UniversalBle.disconnect(device_connecting!.deviceId);
+                    this.dis_connet(device_connecting!);
+                  }
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: RawMaterialButton(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
+                elevation: 0,
+                highlightElevation: 0,
+                fillColor: Colors.blue,
+                splashColor: Colors.orange,
+                textStyle: const TextStyle(color: Colors.white),
+                child: const Text('写数据'),
+                onPressed: () {
+                  this.write_ble("sdfsdf");
+                },
+              ),
             ),
           ],
         ),
@@ -131,8 +191,9 @@ class _HomePageSubState extends State<HomePageSub> {
                     textStyle: const TextStyle(color: Colors.white),
                     child: Text('连接设备：${obj.name}'),
                     onPressed: () {
-                      UniversalBle.disconnect(obj.deviceId);
-                      UniversalBle.connect(obj.deviceId);
+                      this.dis_connet(obj);
+                      this.connet(obj);
+
                       get_ble_connected_stata(obj);
                     },
                   ),
