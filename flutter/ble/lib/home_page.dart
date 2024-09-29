@@ -148,6 +148,7 @@ class _HomePageSubState extends State<HomePageSub> {
 
   @override
   Widget build(BuildContext context) {
+    scan_ble();
     return Column(
       children: [
         Row(
