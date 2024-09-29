@@ -1,3 +1,5 @@
+// ignore_for_file: slash_for_doc_comments, non_constant_identifier_names, unnecessary_this, unused_local_variable, use_function_type_syntax_for_parameters
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -28,6 +30,8 @@ class _HomePageSubState extends State<HomePageSub> {
   BleDevice? device_connecting;
   BleService? service;
   BleCharacteristic? chart;
+  BleDevice? conneted_ble_dev;
+
   void refresh() {
     setState(() {});
   }
@@ -60,9 +64,13 @@ class _HomePageSubState extends State<HomePageSub> {
       ble_scan_result.add(result);
       refresh();
     };
-
     UniversalBle.onConnectionChange = (String deviceId, bool isConnected) {
       debugPrint('OnConnectionChange $deviceId, $isConnected');
+      for (var dev in ble_scan_result) {
+        if (dev.deviceId == deviceId) {
+          conneted_ble_dev = dev;
+        }
+      }
       if (isConnected) {
         () async {
           List<BleService> services =
@@ -78,7 +86,10 @@ class _HomePageSubState extends State<HomePageSub> {
             }
           }
         }(); // 注意这里的调用括号
+      } else {
+        conneted_ble_dev = null;
       }
+      setState(() {});
     };
   }
 
@@ -92,6 +103,49 @@ class _HomePageSubState extends State<HomePageSub> {
         BleOutputProperty.withResponse);
   }
 
+  void scan_ble() {
+    if (is_scanning) {
+      return;
+    }
+    is_scanning = true;
+    UniversalBle.startScan();
+    ble_scan_result.clear();
+    refresh();
+    var timer = Timer(Duration(seconds: 2), () {
+      UniversalBle.stopScan();
+      // for (var val in ble_scan_result) {
+      //   print(val);
+      // }
+      print("stop");
+      // 结束扫描后不要允许马上又发起扫描
+      Timer(Duration(seconds: 1), () {
+        is_scanning = false;
+      });
+    });
+  }
+
+  Padding sample_btn({void on_pressed_cb()?, String? name}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: RawMaterialButton(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15))),
+        elevation: 0,
+        highlightElevation: 0,
+        fillColor: Colors.blue,
+        splashColor: Colors.orange,
+        textStyle: const TextStyle(color: Colors.white),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(name ?? ""),
+        ),
+        onPressed: () {
+          on_pressed_cb?.call();
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -102,107 +156,68 @@ class _HomePageSubState extends State<HomePageSub> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: RawMaterialButton(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15))),
-                elevation: 0,
-                highlightElevation: 0,
-                fillColor: Colors.blue,
-                splashColor: Colors.orange,
-                textStyle: const TextStyle(color: Colors.white),
-                child: const Text('扫描设备'),
-                onPressed: () {
-                  if (is_scanning) {
-                    return;
-                  }
-                  is_scanning = true;
-                  UniversalBle.startScan();
-                  ble_scan_result.clear();
-                  refresh();
-                  var timer = Timer(Duration(seconds: 2), () {
-                    UniversalBle.stopScan();
-                    // for (var val in ble_scan_result) {
-                    //   print(val);
-                    // }
-                    print("stop");
-                    // 结束扫描后不要允许马上又发起扫描
-                    Timer(Duration(seconds: 1), () {
-                      is_scanning = false;
-                    });
-                  });
-                },
+              child: sample_btn(
+                name: "扫描设备",
+                on_pressed_cb: scan_ble,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: RawMaterialButton(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15))),
-                elevation: 0,
-                highlightElevation: 0,
-                fillColor: Colors.blue,
-                splashColor: Colors.orange,
-                textStyle: const TextStyle(color: Colors.white),
-                child: const Text('断开设备'),
-                onPressed: () {
-                  if (device_connecting?.deviceId != null) {
-                    UniversalBle.disconnect(device_connecting!.deviceId);
-                    this.dis_connet(device_connecting!);
-                  }
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: RawMaterialButton(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15))),
-                elevation: 0,
-                highlightElevation: 0,
-                fillColor: Colors.blue,
-                splashColor: Colors.orange,
-                textStyle: const TextStyle(color: Colors.white),
-                child: const Text('写数据'),
-                onPressed: () {
-                  this.write_ble("sdfsdf");
-                },
-              ),
+                padding: const EdgeInsets.all(8.0),
+                child: sample_btn(
+                    name: "断开设备",
+                    on_pressed_cb: () {
+                      if (device_connecting?.deviceId != null) {
+                        UniversalBle.disconnect(device_connecting!.deviceId);
+                        this.dis_connet(device_connecting!);
+                      }
+                    })),
+            sample_btn(
+              name: "发送数据",
+              on_pressed_cb: () {if(conneted_ble_dev != null )this.write_ble("sdfsdf");},
             ),
           ],
         ),
-        Expanded(
-          child: SizedBox(
-            // height: 200,
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              children: ble_scan_result.map((obj) {
-                return Container(
-                  alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  // child: Text(obj.toString()),
-                  child: RawMaterialButton(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0),
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    elevation: 0,
-                    highlightElevation: 0,
-                    fillColor: Colors.blue,
-                    splashColor: Colors.orange,
-                    textStyle: const TextStyle(color: Colors.white),
-                    child: Text('连接设备：${obj.name}'),
-                    onPressed: () {
-                      this.dis_connet(obj);
-                      this.connet(obj);
-
-                      get_ble_connected_stata(obj);
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ),
+        Text(
+            "当前连接设备：${(conneted_ble_dev == null ? "无" : conneted_ble_dev?.name)}"),
+        // 扫描完成后会创建一个btn列表
+        widget_devices_list(),
       ],
+    );
+  }
+
+  void connect_ble(BleDevice dev) {
+    this.dis_connet(dev);
+    this.connet(dev);
+    get_ble_connected_stata(dev);
+  }
+
+  Expanded widget_devices_list() {
+    return Expanded(
+      child: SizedBox(
+        // height: 200,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          children: ble_scan_result.map((obj) {
+            return Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                // child: Text(obj.toString()),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    sample_btn(
+                      name: '连接该设备：${obj.name}',
+                      on_pressed_cb: () {
+                        this.dis_connet(obj);
+                        this.connet(obj);
+                        get_ble_connected_stata(obj);
+                      },
+                    ),
+                  ],
+                ));
+          }).toList(),
+        ),
+      ),
     );
   }
 }
