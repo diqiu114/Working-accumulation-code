@@ -518,6 +518,8 @@ If you are on Windows: try adding firewall exceptions to your Android Studio.
    运行 `flutter build apk --split-per-abi`
    （`flutter build` 默认带有 `--release` 参数。）
 
+   `flutter build apk --split-per-abi` 命令可以生成针对不同 ABI（Application Binary Interface，应用二进制接口）的多个 APK，这主要用于优化安装包的大小，让每个 APK 只包含特定 CPU 架构（如 arm64-v8a, armeabi-v7a, x86）的支持库，从而减少每个 APK 的体积。
+
 # 遇到的问题
 
 ## window ble
