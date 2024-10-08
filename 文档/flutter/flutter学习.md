@@ -520,6 +520,20 @@ If you are on Windows: try adding firewall exceptions to your Android Studio.
 
    `flutter build apk --split-per-abi` 命令可以生成针对不同 ABI（Application Binary Interface，应用二进制接口）的多个 APK，这主要用于优化安装包的大小，让每个 APK 只包含特定 CPU 架构（如 arm64-v8a, armeabi-v7a, x86）的支持库，从而减少每个 APK 的体积。
 
+# flutter中的机制
+
+## setState
+
+在Flutter中，`setState`方法主要用于更新Widget的状态。当你调用`setState`时，它会告诉Flutter框架这个Widget的状态已经改变，需要重新构建（rebuild）。具体来说，`setState`会做以下几件事情：
+
+1. **标记状态改变**：`setState`会将当前的Widget标记为"dirty"（脏的），这意味着Widget的状态已经改变，需要重新绘制。
+2. **触发构建过程**：一旦当前的动画帧完成，Flutter框架会安排一个新的构建过程，这时，标记为"dirty"的Widget将会被重建。
+3. **更新界面**：在重建过程中，Flutter会调用Widget的`build`方法，根据最新的状态生成新的Widget树。这样，UI就会根据最新的状态显示出来。
+
+简单来说，你可以理解`setState`是告诉Flutter：“这里的数据变了，需要重新显示出来”。这样Flutter就会重新运行`build`方法，根据最新的状态数据来构建和更新界面。
+
+
+
 # 遇到的问题
 
 ## window ble

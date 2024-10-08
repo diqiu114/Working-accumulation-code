@@ -72,6 +72,9 @@ class _HomePageSubState extends State<HomePageSub> {
         }
       }
       if (isConnected) {
+        // 连接成功后清楚扫描到的蓝牙列表
+        ble_scan_result.clear();
+        refresh();
         () async {
           List<BleService> services =
               await UniversalBle.discoverServices(deviceId);
@@ -91,16 +94,22 @@ class _HomePageSubState extends State<HomePageSub> {
       }
       setState(() {});
     };
+    // 初始化完成后，扫描一下蓝牙
+    scan_ble();
   }
 
   void write_ble(String str) async {
     var send_val = Uint8List.fromList(utf8.encode(str));
-    await UniversalBle.writeValue(
-        this.device_connecting!.deviceId,
-        this.service!.uuid,
-        this.chart!.uuid,
-        send_val,
-        BleOutputProperty.withResponse);
+    try {
+      await UniversalBle.writeValue(
+          this.device_connecting!.deviceId,
+          this.service!.uuid,
+          this.chart!.uuid,
+          send_val,
+          BleOutputProperty.withResponse);
+    } catch (e) {
+      print("向ble发送数据出错了" + e.toString());
+    }
   }
 
   void scan_ble() {
@@ -148,7 +157,6 @@ class _HomePageSubState extends State<HomePageSub> {
 
   @override
   Widget build(BuildContext context) {
-    scan_ble();
     return Column(
       children: [
         Row(
@@ -172,9 +180,22 @@ class _HomePageSubState extends State<HomePageSub> {
                         this.dis_connet(device_connecting!);
                       }
                     })),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
             sample_btn(
-              name: "发送数据",
-              on_pressed_cb: () {if(conneted_ble_dev != null )this.write_ble("sdfsdf");},
+              name: "设置为单天线",
+              on_pressed_cb: () {
+                if (conneted_ble_dev != null) this.write_ble('{"select_ui":0}');
+              },
+            ),
+            sample_btn(
+              name: "设置为双天线",
+              on_pressed_cb: () {
+                if (conneted_ble_dev != null) this.write_ble('{"select_ui":1}');
+              },
             ),
           ],
         ),
