@@ -1,0 +1,4 @@
+[submodule "flutter/smart_home"]
+	path = flutter/smart_home
+	url = https://gitee.com/langdaodao/flutterupper_computer.git
+	branch = smart_home
