@@ -532,6 +532,16 @@ If you are on Windows: try adding firewall exceptions to your Android Studio.
 
 简单来说，你可以理解`setState`是告诉Flutter：“这里的数据变了，需要重新显示出来”。这样Flutter就会重新运行`build`方法，根据最新的状态数据来构建和更新界面。
 
+# flutter教程学习
+
+## wiget
+
+一切都是 widget
+
+小部件根据组合形成层次结构。每个小部件都嵌套在其父级中，并且可以从父级接收上下文。此结构一直延续到根小部件，如以下简单示例所示
+
+
+
 
 
 # 遇到的问题
