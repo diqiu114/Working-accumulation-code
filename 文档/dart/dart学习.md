@@ -881,3 +881,182 @@ void main() {
 }
 ```
 
+### isolate（中译：隔离）
+
+一般场景下，完全无需关心 isolate。通常一个 Dart 应用会在主 isolate 下执行所有代码，如下图所示：
+
+![A figure showing a main isolate, which runs `main()`, responds to events, and then exits](dart学习.assets/basics-main-isolate.png)
+
+#### 事件处理
+
+在客户端应用中，主 isolate 的事件队列内，可能会包含重绘的请求、点击的通知或者其他界面事件。例如，下图展示了包含四个事件的事件队列，队列会按照先进先出的模式处理事件。
+
+![A figure showing events being fed, one by one, into the event loop](dart学习.assets/event-loop.png)
+
+如下图所示，在 `main()` 方法执行完毕后，事件队列中的处理才开始，此时处理的是第一个重绘的事件。而后主 isolate 会处理点击事件，接着再处理另一个重绘事件。
+
+![A figure showing the main isolate executing event handlers, one by one](dart学习.assets/event-handling.png)
+
+如果某个同步执行的操作花费了很长的处理时间，应用看起来就像是失去了响应。在下图中，处理点击事件的代码比较耗时，导致紧随其后的事件并没有及时处理。这时应用可能会产生卡顿，所有的动画都无法流畅播放。
+
+![A figure showing a tap handler with a too-long execution time](dart学习.assets/event-jank.png)
+
+在一个客户端应用中，耗时过长的同步操作，通常会导致 [卡顿的动画](https://flutter.cn/docs/perf/rendering-performance)。而最糟糕的是，应用界面可能完全失去响应。
+
+#### 后台运行对象
+
+如果你的应用受到耗时计算的影响而出现卡顿，例如 [解析较大的 JSON 文件](https://flutter.cn/docs/cookbook/networking/background-parsing)，你可以考虑将耗时计算转移到单独工作的 isolate，通常我们称这样的 isolate 为 **后台运行对象**。下图展示了一种常用场景，你可以生成一个 isolate，它将执行耗时计算的任务，并在结束后退出。这个 isolate 工作对象退出时会把结果返回。
+
+![A figure showing a main isolate and a simple worker isolate](dart学习.assets/isolate-bg-worker.png)
+
+每个 isolate 都可以通过消息通信传递一个对象，这个对象的所有内容都需要满足可传递的条件。并非所有的对象都满足传递条件，在无法满足条件时，消息发送会失败。举个例子，如果你想发送一个 `List<Object>`，你需要确保这个列表中所有元素都是可被传递的。假设这个列表中有一个 `Socket`，由于它无法被传递，所以你无法发送整个列表。
+
+你可以查阅 [`send()` 方法](https://api.dart.cn/stable/dart-isolate/SendPort/send.html) 的文档来确定哪些类型可以进行传递。
+
+Isolate 工作对象可以进行 I/O 操作、设置定时器，以及其他各种行为。它会持有自己内存空间，与主 isolate 互相隔离。这个 isolate 在阻塞时也不会对其他 isolate 造成影响。
+
+简单示例：
+
+```
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:isolate';
+
+const filename = 'json_01.json';
+
+Future<void> main() async {
+  // Read and parse JSON data in a new isolate,
+  // then store the returned Dart representation.
+  final jsonData = await Isolate.run(() => _readAndParseJson(filename));
+
+  print('Received JSON with ${jsonData.length} keys');
+}
+
+/// Reads the contents of the file with [filename],
+/// decodes the JSON, and returns the result.
+Future<Map<String, dynamic>> _readAndParseJson(String filename) async {
+  final fileData = await File(filename).readAsString();
+  final jsonData = jsonDecode(fileData) as Map<String, dynamic>;
+  return jsonData;
+}
+```
+
+如果你想在 isolate 之间建立更多的通信，那么你需要使用 `SendPort` 的 [`send()` 方法](https://api.dart.cn/stable/dart-isolate/SendPort/send.html)。下图展示了一种常见的场景，主 isolate 会发送请求消息至 isolate 工作对象，然后它们之间会继续进行多次通信，进行请求和回复。
+
+![A figure showing the main isolate spawning the isolate and then sending a request message, which the worker isolate responds to with a reply message; two request-reply cycles are shown](dart学习.assets/isolate-custom-bg-worker.png)
+
+下方列举的 [isolate 示例](https://github.com/dart-lang/samples/tree/master/isolates) 包含了发送多次消息的使用方法：
+
+- [send_and_receive.dart](https://github.com/dart-lang/samples/tree/master/isolates/bin/send_and_receive.dart) 展示了如何从主 isolate 发送消息至生成的 isolate，与前面的示例较为接近，不过没有使用 `run()` 方法；
+
+- [long_running_isolate.dart](https://github.com/dart-lang/samples/tree/master/isolates/bin/long_running_isolate.dart) 展示了如何生成一个长期运行、且多次发送和接收消息的 isolate。
+
+  - 示例：
+
+  - ```
+    // Copyright (c) 2021, the Dart project authors. Please see the AUTHORS file
+    // for details. All rights reserved. Use of this source code is governed by a
+    // BSD-style license that can be found in the LICENSE file.
+    
+    // Spawn an isolate, read multiple files, send their contents to the spawned
+    // isolate, and wait for the parsed JSON.
+    import 'dart:async';
+    import 'dart:convert';
+    import 'dart:ffi';
+    import 'dart:io';
+    import 'dart:isolate';
+    
+    import 'package:async/async.dart';
+    
+    const filenames = [
+      'json_01.json',
+      'json_02.json',
+      'json_03.json',
+    ];
+    
+    void main() async {
+      var temp = await _sendAndReceive(filenames);
+      for(var obj in temp) {
+    
+      }
+      print(await temp.length);
+      await for (final jsonData in _sendAndReceive(filenames)) {
+        print('Received JSON with ${jsonData.length} keys');
+      }
+    }
+    
+    // Spawns an isolate and asynchronously sends a list of filenames for it to
+    // read and decode. Waits for the response containing the decoded JSON
+    // before sending the next.
+    //
+    // Returns a stream that emits the JSON-decoded contents of each file.
+    Stream<Map<String, dynamic>> _sendAndReceive(List<String> filenames) async* {
+      final p = ReceivePort();
+      await Isolate.spawn(_readAndParseJsonService, p.sendPort);
+    
+      // Convert the ReceivePort into a StreamQueue to receive messages from the
+      // spawned isolate using a pull-based interface. Events are stored in this
+      // queue until they are accessed by `events.next`.
+      final events = StreamQueue<dynamic>(p);
+    
+      // The first message from the spawned isolate is a SendPort. This port is
+      // used to communicate with the spawned isolate.
+      SendPort sendPort = await events.next;
+    
+      for (var filename in filenames) {
+        // Send the next filename to be read and parsed
+        sendPort.send(filename);
+    
+        // Receive the parsed JSON
+        Map<String, dynamic> message = await events.next;
+    
+        // Add the result to the stream returned by this async* function.
+        yield message;
+      }
+    
+      // Send a signal to the spawned isolate indicating that it should exit.
+      sendPort.send(null);
+    
+      // Dispose the StreamQueue.
+      await events.cancel();
+    }
+    
+    // The entrypoint that runs on the spawned isolate. Receives messages from
+    // the main isolate, reads the contents of the file, decodes the JSON, and
+    // sends the result back to the main isolate.
+    Future<void> _readAndParseJsonService(SendPort p) async {
+      print('Spawned isolate started.');
+    
+      // Send a SendPort to the main isolate so that it can send JSON strings to
+      // this isolate.
+      final commandPort = ReceivePort();
+      p.send(commandPort.sendPort);
+    
+      // Wait for messages from the main isolate.
+      await for (final message in commandPort) {
+        if (message is String) {
+          // Read and decode the file.
+          final contents = await File(message).readAsString();
+    
+          // Send the result to the main isolate.
+          p.send(jsonDecode(contents));
+        } else if (message == null) {
+          // Exit if the main isolate sends a null message, indicating there are no
+          // more files to read and parse.
+          break;
+        }
+      }
+    
+      print('Spawned isolate finished.');
+      Isolate.exit();
+      }
+    ```
+
+    
+
+## 性能和 isolate 组
+
+当一个 isolate 调用了 [`Isolate.spawn()`](https://api.dart.cn/stable/dart-isolate/Isolate/spawn.html)，两个 isolate 将拥有同样的执行代码，并归入同一个 **isolate 组** 中。 Isolate 组会带来性能优化，例如新的 isolate 会运行由 isolate 组持有的代码，即共享代码调用。同时，`Isolate.exit()` 仅在对应的 isolate 属于同一组时有效。
+
+某些场景下，你可能需要使用 [`Isolate.spawnUri()`](https://api.dart.cn/stable/dart-isolate/Isolate/spawnUri.html)，使用执行的 URI 生成新的 isolate，并且包含代码的副本。然而，`spawnUri()` 会比 `spawn()` 慢很多，并且新生成的 isolate 会位于新的 isolate 组。另外，当 isolate 在不同的组中，它们之间的消息传递会变得更慢。
