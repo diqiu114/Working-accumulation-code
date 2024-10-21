@@ -544,6 +544,32 @@ If you are on Windows: try adding firewall exceptions to your Android Studio.
 
 
 
+# flutter包
+
+## 通知组件
+
+### provider
+
+包引入
+
+```
+import 'package:provider/provider.dart';
+```
+
+使用
+
+```
+ChangeNotifierProvider
+// 参数：
+create: (BuildContext context) => 返回一个ChangeNotifier子类，该子类内容将被监听，并使用:
+	notifyListeners提示
+builder：(BuildContext context, create中创建的ChangeNotifier子类 obj, Widget? child) {
+	return 一个widget;
+}
+```
+
+注意：create中传入的子类会被一些处理，最终导致builder和create的不一样（可能经过了对对象的复制）。
+
 # 遇到的问题
 
 ## window ble

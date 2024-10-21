@@ -80,6 +80,23 @@ final Map<String, dynamic> params = <String, dynamic>
 
 综合起来，这行代码声明了一个只读的 `Map` 类型的变量 `params`，其键为 `String` 类型，值为 `dynamic` 类型，并将一个空的 `Map` 对象赋值给它。在后续代码中，可以使用 `params` 变量来存储和访问键值对数据，但不能修改 `params` 的引用或内容。
 
+### 访问元素
+
+```
+void main() {
+  Map<String, int> myMap = {
+    'one': 1,
+    'two': 2,
+    'three': 3,
+  };
+
+  print(myMap['one']); // 输出: 1
+  print(myMap['four']); // 输出: null (键不存在时返回 null)
+}
+```
+
+
+
 ## dynamic
 
 在Dart中，`dynamic` 是一种特殊的数据类型，它表示一个可以存储任意类型的值的变量。当一个变量被声明为 `dynamic` 类型，Dart 编译器将不会对其类型进行静态检查，也就是说，你可以给这个变量赋予任何类型的值，并且编译器不会报错。
