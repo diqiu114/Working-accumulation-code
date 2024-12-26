@@ -1,0 +1,3 @@
+ ./adb.exe shell
+ pm disable-user com.hihonor.ouc
+ pm enable-user com.hihonor.ouc
