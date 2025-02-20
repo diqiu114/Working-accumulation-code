@@ -3,7 +3,8 @@ import os
 import xlrd
 from openpyxl import Workbook
 from openpyxl import load_workbook
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Border, Side
+from openpyxl import utils
 
 #将指定的xls文件转换为xlsx格式
 def xls_to_xlsx(src_file_path,dst_file_path):
@@ -41,6 +42,50 @@ def xls_to_xlsx(src_file_path,dst_file_path):
     del wb_xlsx[new_sheet_names[0]]
     #保存xlsx格式文件
     wb_xlsx.save(f'{dst_file_path}')
+
+def ColAligement(ws,col):
+    stringList =[]
+    maxLength =0
+    
+    for cell in ws[utils.get_column_letter(col)]:
+        length =0
+        try:
+            value = float(cell.value)
+        except Exception as e:
+            value = cell.value
+        else:
+            # 浮点数有时候会很长，精确到小数点后几位
+            value = round(value, 3)
+        # print(value)
+        for char in str(value):
+            if ord(char)> 256:
+                length += 1.7
+            else:length += 1
+        if length > maxLength:
+            maxLength = length
+    # print(maxLength)
+    ws.column_dimensions[utils.get_column_letter(col)].width = maxLength+4
+
+def auto_adjust_column_width(sheet):
+    # print(sheet)
+    for col in range(1, sheet.max_column + 1):  # 修正：包括最后一列
+        ColAligement(sheet, col)
+
+def auto_adjust_row_height(sheet):
+    for row in range(1, sheet.max_row + 1):  # 修正：包括最后一行
+        sheet.row_dimensions[row].height = 18
+
+def add_grid_lines(sheet):
+    # 创建一个边框样式
+    thin_border = Border(left=Side(border_style="thin", color="000000"),
+                         right=Side(border_style="thin", color="000000"),
+                         top=Side(border_style="thin", color="000000"),
+                         bottom=Side(border_style="thin", color="000000"))
+    
+    # 为所有单元格设置边框
+    for row in sheet.iter_rows():
+        for cell in row:
+            cell.border = thin_border
 
 def run(in_file_path = "", out_file_path = "", title = ""):
     # print(f"{in_file_path}, {out_file_path}, {title}")
@@ -83,13 +128,6 @@ def run(in_file_path = "", out_file_path = "", title = ""):
     max_column = in_sheet.max_column +1
     #处理各个工作薄
     for new_sheet in new_sheets:
-        # 标题
-        new_sheet.cell(row=1, column=1).value = new_sheet.title + title
-        # 合并单元格
-        new_sheet.merge_cells(start_row=1, start_column=1, end_row=1, end_column=max_column)
-        # 居中显示
-        center_alignment = Alignment(horizontal='center', vertical='center')
-        new_sheet.cell(row=1, column=1).alignment  = center_alignment
         # 表格内容里的分类，从旧表复制到新表
         for col in range(1, max_column):
             source_cell = in_sheet.cell(row=2, column=col)
@@ -136,7 +174,32 @@ def run(in_file_path = "", out_file_path = "", title = ""):
             sum += float(value)
         new_sheet.cell(row = max_row, column = col).value = sum
 
+        max_row = new_sheet.max_row +1
+        max_column = new_sheet.max_column +1
 
+        #整个表格左对齐
+        for row in range(2, max_row):
+            for col in range(1, max_column):
+                center_alignment = Alignment(horizontal='left', vertical='center')
+                new_sheet.cell(row=row, column=col).alignment  = center_alignment
+        # 添加网格线
+        add_grid_lines(new_sheet)
+
+        auto_adjust_column_width(new_sheet)
+        auto_adjust_row_height(new_sheet)
+
+        # 标题
+        new_sheet.cell(row=1, column=1).value = new_sheet.title + title
+        # 合并单元格
+        new_sheet.merge_cells(start_row=1, start_column=1, end_row=1, end_column=max_column-1)
+        # 居中显示
+        center_alignment = Alignment(horizontal='center', vertical='center')
+        new_sheet.cell(row=1, column=1).alignment  = center_alignment
+
+    #重命名各个工作薄
+    for new_sheet in new_sheets:
+        new_sheet.title = new_sheet.title + title
+        
     del_sheet_name = new_wb.sheetnames
     del new_wb[del_sheet_name[0]]
     new_wb.save(out_file_path)

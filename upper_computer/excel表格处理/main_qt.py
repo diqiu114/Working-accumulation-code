@@ -67,9 +67,12 @@ class MyMainWindow(QMainWindow):
             msg.exec()
             return
         self.title = self.ui.line_edit_out_file_title.text()
+        # run.run(self.source_file_path, self.save_file_path, self.title) 
+
         try:
             run.run(self.source_file_path, self.save_file_path, self.title) 
         except Exception as e:
+            print(e)
             # 创建一个警告消息框
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
