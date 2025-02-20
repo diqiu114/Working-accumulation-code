@@ -22,13 +22,13 @@ def xls_to_xlsx(src_file_path,dst_file_path):
     #查看第一个sheet有多少行和列数据
     nrows = ws_xls.nrows
     ncols = ws_xls.ncols
-    print(nrows,ncols)
+    print(f"xls转xlsx中，列数：{nrows}, 行数{ncols}")
     
     #读取xls第一个sheet内容存到写入列表中
     sheet_msg_xls = []
     for i in range(nrows):
         sheet_msg_xls.append(ws_xls.row_values(i))
-    print(len(sheet_msg_xls))
+    print(f"转换后的列表长度：{len(sheet_msg_xls)}")
     #创建xlsx文件并写入到对应文件中，一般文件同名,sheet名称一致
     wb_xlsx = Workbook()
     #在xlsx创建同名sheet
@@ -91,7 +91,7 @@ def run(in_file_path = "", out_file_path = "", title = ""):
         for col in range(1, max_column):
             source_cell = in_sheet.cell(row=2, column=col)
             new_sheet.cell(row=2, column=col).value = source_cell.value
-        # 从数据结构中获取到同意名称的多个行数
+        # 从数据结构中获取到同一名称的多个行数
         in_sheet_row = 3
         for write_row in data[new_sheet.title]:
             # 复制整行数据
@@ -102,6 +102,42 @@ def run(in_file_path = "", out_file_path = "", title = ""):
                 # 将值复制到目标单元格
                 new_sheet.cell(row=in_sheet_row, column=write_col).value = source_cell.value
             in_sheet_row += 1
+
+        max_row = new_sheet.max_row +1
+        # 找到列数
+        col = 0
+        for value in new_sheet[2]:
+            col += 1
+            # 在这列结尾行写入名字
+            if value.value == "品名":
+                new_sheet.cell(row = max_row, column = col).value = "合计"
+
+        # 找到列数
+        col = 0
+        for value in new_sheet[2]:
+            col += 1
+            if value.value == "数量":
+                break
+        # 计算本列和
+        sum = 0.0
+        for row in range(3, max_row):
+            value = new_sheet.cell(row = row, column = col).value
+            sum += float(value)
+        new_sheet.cell(row = max_row, column = col).value = sum
+        
+        # 计算价税合计
+        col = 0
+        for value in new_sheet[2]:
+            col += 1
+            if value.value == "价税合计":
+                break
+        # 计算本列和
+        sum = 0.0
+        for row in range(3, max_row):
+            value = new_sheet.cell(row = row, column = col).value
+            sum += float(value)
+        new_sheet.cell(row = max_row, column = col).value = sum
+
 
     del_sheet_name = new_wb.sheetnames
     del new_wb[del_sheet_name[0]]
