@@ -34,7 +34,7 @@ class MyMainWindow(QMainWindow):
     def btn_select_file_clicked(self):
         options = QFileDialog.Options()
         # 使用 getOpenFileName 来选择文件进行读取
-        self.source_file_path, _ = QFileDialog.getOpenFileName(self, '选择文件', '', 'Excel Files (*.xlsx);(*.xls);;All Files (*)', options=options)
+        self.source_file_path, _ = QFileDialog.getOpenFileName(self, '选择文件', '', 'Excel Files (*.xlsx *.xls);;All Files (*)', options=options)
         self.ui.line_edit_select_file.setText(self.source_file_path)
 
 

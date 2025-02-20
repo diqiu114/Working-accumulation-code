@@ -51,11 +51,14 @@ def run(in_file_path = "", out_file_path = "", title = ""):
         stash_in_file = in_file_path
     in_sheet_name = os.path.splitext(os.path.basename(in_file_path))[0]
     #载入工作表
-    in_wb = load_workbook(filename = stash_in_file)
-    in_sheet = in_wb[in_sheet_name]
-    if in_sheet == None:
+    in_wb = load_workbook(filename = stash_in_file, data_only=True)
+    try:
+        in_sheet = in_wb[in_sheet_name]
+    except Exception as e:
+        print(f"未找到与文件名同名工作薄，改为直接载入第一个工作薄，错误信息：{e}")
         in_sheet = in_wb.worksheets[0]
-        
+    else:
+        pass        
     # 旧表筛选重复供应商并保存到数据中
     row_index = 3
     column_index = 1
@@ -104,19 +107,14 @@ def run(in_file_path = "", out_file_path = "", title = ""):
             in_sheet_row += 1
 
         max_row = new_sheet.max_row +1
-        # 找到列数
-        col = 0
-        for value in new_sheet[2]:
-            col += 1
-            # 在这列结尾行写入名字
-            if value.value == "品名":
-                new_sheet.cell(row = max_row, column = col).value = "合计"
 
         # 找到列数
         col = 0
         for value in new_sheet[2]:
             col += 1
             if value.value == "数量":
+                #在 数量 前两个单元格插入合计
+                new_sheet.cell(row = max_row, column = col-2).value = "合计"
                 break
         # 计算本列和
         sum = 0.0
