@@ -201,5 +201,16 @@ def run(in_file_path = "", out_file_path = "", title = ""):
         new_sheet.title = new_sheet.title + title
         
     del_sheet_name = new_wb.sheetnames
+    # 删除第一个表，因为第一个时默认生成的空表
     del new_wb[del_sheet_name[0]]
+
+    # 设置工作表的打印缩放比例，使其内容适合一页。
+    for sheet in new_wb.worksheets:
+        sheet.page_setup.fitToWidth = 1
+        # sheet.page_setup.fitToHeight = 1
+
     new_wb.save(out_file_path)
+
+
+if __name__ == "__main__":
+    run("./2025-01月份采购入库明细(1).xls", "2025-01月份采购入库明细处理完成.xlsx", "sdf")

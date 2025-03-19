@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(449, 403)
+        MainWindow.resize(635, 341)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
@@ -56,6 +56,8 @@ class Ui_MainWindow(object):
 
         self.line_edit_select_file = QLineEdit(self.widget_2)
         self.line_edit_select_file.setObjectName(u"line_edit_select_file")
+        self.line_edit_select_file.setEnabled(True)
+        self.line_edit_select_file.setMinimumSize(QSize(400, 0))
 
         self.horizontalLayout.addWidget(self.line_edit_select_file)
 
@@ -118,7 +120,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 449, 21))
+        self.menubar.setGeometry(QRect(0, 0, 635, 21))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
