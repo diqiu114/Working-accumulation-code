@@ -37,11 +37,27 @@ sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic m
 更新软件包列表后，您就可以安装更新版本的`clangd`了。例如，安装`clangd-12`：
 
 ```
-bash复制编辑sudo apt update
+bash复制编辑
+
+sudo apt update
 sudo apt install clangd-12
 ```
 
 安装完成后，您可以通过之前提到的`update-alternatives`命令来设置默认的`clangd`版本。
+
+
+
+### 上面失败，换个安装方式，这里安装clangd19
+
+```
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+sudo ./llvm.sh
+sudo apt install clangd
+clangd --version
+```
+
+
 
 ## bear下载：
 
@@ -50,7 +66,8 @@ sudo apt install clangd-12
 1. 更新 PPA 依赖库
 
    ```
-   bash复制编辑sudo add-apt-repository ppa:savoury1/build-tools -y
+   bash复制编辑
+   sudo add-apt-repository ppa:savoury1/build-tools -y
    sudo add-apt-repository ppa:savoury1/backports -y
    sudo apt-get update
    ```
@@ -62,7 +79,7 @@ sudo apt install clangd-12
    
    
    复制编辑
-   sudo apt-get install libear libgrpc++1
+   sudo apt-get install libear libgrpc++1 -y
    ```
 
    如果这些库仍然无法安装，说明 PPA 中可能没有 Ubuntu 18.04 的支持。
@@ -71,35 +88,16 @@ sudo apt install clangd-12
 
 Bear 的官方包在 Ubuntu 18.04 中的版本为 2.3.11。要获取更新版本，可以使用第三方 PPA 仓库。以下是使用 Rob Savoury 提供的 PPA 仓库安装 Bear 3.1.4 的步骤：
 
-1. **添加 PPA 仓库：**
+1. **安装 Bear：**
 
    ```
    bash
    
    
    复制编辑
-   sudo add-apt-repository ppa:savoury1/build-tools
+   sudo apt-get install bear -y
    ```
 
-2. **更新包列表：**
-
-   ```
-   bash
-   
-   
-   复制编辑
-   sudo apt-get update
-   ```
-
-3. **安装 Bear：**
-
-   ```
-   bash
-   
-   
-   复制编辑
-   sudo apt-get install bear
-   ```
 
 通过上述步骤，您将安装 Bear 的 3.1.4 版本。
 
@@ -196,3 +194,4 @@ clangd.restart
 ```
 
 点击后等待创建完毕，vscode下方状态栏会有进度信息
+
