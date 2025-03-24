@@ -390,6 +390,15 @@ mount.nfs: access denied by server while mounting 192.168.100.247:/home/ubuntu18
 
 # 一些命令
 
+## source
+
+`source` 是 Shell 中的一个内置命令，其核心作用是**在当前 Shell 会话中直接执行指定脚本**（而非启动新的子 Shell）。以下是其关键作用和特点：
+
+### 1. **作用原理**
+
+- **直接加载到当前 Shell**： 通过 `source script.sh` 或 `. script.sh`（`.` 是 `source` 的简写）执行的脚本中的命令（如 `export`、`alias`），会直接影响当前 Shell 的环境变量或配置。
+- **对比直接运行脚本**： 若直接通过 `./script.sh` 或 `bash script.sh` 运行脚本，系统会启动一个子 Shell，脚本中的环境变量仅在子 Shell 中生效，退出后父 Shell（当前终端）**不会保留这些变更**。
+
 ### linux中>>和>区别
 
 重定向输出，会清空之前内容
@@ -1597,6 +1606,86 @@ dup2：
 | **自动关闭**      | 不会自动关闭任何文件描述符     | 如果 `newfd` 已打开，则先关闭       |
 | **操作相同的 FD** | 不支持                         | 如果 `oldfd == newfd`，则不做任何事 |
 | **常用场景**      | 简单复制                       | 更精确的重定向（如标准输入/输出）   |
+
+查看elf文件：
+
+```
+arm-linux-gnueabi-readelf ledtest -a >> test.elf
+```
+
+elf文件中信息解释：
+
+# 链接器和动态库
+
+### **动态链接器**
+
+Program Headers 中：INTERP项会说明需要链接器和路径：
+
+```
+[Requesting program interpreter: /lib/xxx]
+```
+
+#### 指定动态链接器
+
+ld-musl-armhf.so.1：一种动态连接器
+
+```
+xxx-gcc -Wl,--dynamic-linker=/lib/ld-musl-armhf.so.1 xxx.c -o xxx
+```
+
+#### 不同动态链接库之间的差别
+
+- **`ld-linux.so.3`**： 属于 **glibc**（GNU C Library），是 Linux 系统中广泛使用的标准库实现，功能全面但体积较大，支持多种扩展和动态加载机制（如延迟绑定）。常见于桌面和服务器环境 
+
+  **库搜索路径**：依赖 `/etc/ld.so.cache` 缓存文件加速库查找，支持通过 `LD_LIBRARY_PATH` 环境变量扩展路径
+
+  **线程模型**：使用 **Native POSIX Thread Library (NPTL)**，支持复杂的线程安全机制。
+
+  **设计目标和兼容性：**
+
+  - glibc 使用 **Native POSIX Thread Library (NPTL)**，支持复杂的线程安全机制。
+
+  - 支持丰富的扩展功能（如 `glibc` 特有的线程模型和错误处理机制）。
+  - 动态加载支持**延迟绑定**（Lazy Binding），允许库按需加载，减少内存占用。
+  - 兼容性强，广泛应用于主流 Linux 发行版
+
+- **`ld-musl-armhf.so.1`**： 属于 **musl libc**，专为嵌入式系统设计，强调轻量、高效和严格遵循 POSIX 标准。musl 动态链接器体积更小，启动更快，适用于资源受限的环境（如 IoT 设备或嵌入式 Linux 发行版） 
+
+  **库搜索路径**：直接搜索预设路径（如 `/lib`、`/usr/lib`），不依赖缓存文件，配置更简单但灵活性较低 
+
+  **线程模型:**线程模型更简化，某些情况下可能在高并发场景中出现性能问题 
+
+  **资源占用与性能:**
+
+  - **体积**
+
+    musl 的动态链接器通常比 glibc 小 50% 以上，适合存储空间有限的设备
+
+  - **内存占用**
+
+  - musl 在静态链接和内存分配优化上表现更好，而 glibc 的malloc实现在多线程环境下更高效
+
+  - **启动速度**： 
+
+  - musl 的启动时间更短，适合需要快速启动的嵌入式应用
+
+  **设计目标和兼容性：**
+
+  - 严格遵循 POSIX 标准，避免非标准扩展，代码简洁且内存占用低。
+  - 不支持延迟绑定，所有依赖库在程序启动时**一次性加载**，可能增加启动时间但提高确定性。
+  - 在嵌入式场景（如 OpenWrt、Alpine Linux）中表现优异，但对部分 glibc 扩展功能的兼容性有限
+
+
+
+### 需要什么动态库
+
+Dynamic section 中：NEEDED项目会说明需要的链接库：
+
+```
+Shared library: [xxx]
+```
+
+
 
 
 
