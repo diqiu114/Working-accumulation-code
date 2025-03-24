@@ -1,3 +1,18 @@
+
+
+## 仓库地址
+
+```
+remote.origin.url=https://github.com/Embedfire/ebf_linux_kernel.git
+branch.ebf_4.19.35_imx6ul.remote=origin
+branch.ebf_4.19.35_imx6ul.merge=refs/heads/ebf_4.19.35_imx6ul
+branch.ebf_4.19.35_imx6ul.vscode-merge-base=origin/ebf_4.1.15_imx
+```
+
+
+
+## 设置静态ip
+
 新版 Debian（特别是 Debian 9 及更新版本）默认使用 **`systemd-networkd` 或 `NetworkManager`** 来管理网络，而不是 `/etc/network/interfaces` 文件。
 
 野火的用的是systemd-networkd
@@ -68,3 +83,20 @@ ip a show eth2
 bash复制编辑sudo systemctl enable systemd-networkd
 sudo reboot
 ```
+
+## 编译内核注意事项：
+
+要用根目录下的
+
+```
+make_deb.sh
+```
+
+用make_lite.sh不对
+
+编译完成后，内核源码要用
+
+```
+KERNELDIR = xx/ebf_linux_kernel/build_image/build
+```
+

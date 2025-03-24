@@ -175,7 +175,13 @@ yzq-linux@ubuntu:/etc/ssh$ ps -e|grep ssh
 
 # 挂载共享文件夹
 
-**主机开发板互相ping通**
+## 问题集
+
+### 主机开发板不能互相ping通
+
+有时候主机能ping通板子，但是板子不能ping通主机，是因为主机是虚拟机，和主板分配的ip网段不是一样的，所以ping不通，这个时候要在虚拟机的设置里面新增桥接网卡，注意是新增，和网络虚拟管理器没什么关系
+
+## 开始挂在共享文件夹
 
 **主机开启nfs服务**
 
@@ -197,17 +203,24 @@ id
 
 这个id后面要用
 
-**配置NFS**
+**配置NFS让主板的ip能够访问主机**
 
 安装**NFS**服务后，会新增一个/etc/exports文件（即/etc目录下名字为exports的文件），NFS服务根 据它的配置来运行
 
 **修改配置文件**
 
 ```
+sudo nano /etc/exports
+```
+
+
+
+```
 #把以下内容添加至/etc/exports文件末尾，注意以下内容处于同一行
 #以下内容的IP地址和uid，gid需要根据自己的环境进行修改
 #第一个为主机共享文件夹，第二个为允许访问的ip
-/home/embedfire/workdir 192.168.0.0/24(rw,sync,all_squash,anonuid=998,anongid=998,no_subtree_check)
+#192.168.100.0，表示这个网段，
+/home/embedfire/workdir 192.168.100.0/24(rw,sync,all_squash,anonuid=998,anongid=998,no_subtree_check)
 ```
 
 **创建共享目录**
@@ -257,7 +270,7 @@ showmount -e 192.168.7.107
 
 ![未找到图片](linux学习.assets/mountn011.jpg)
 
-**临时挂载NFS文件系统**
+### **临时挂载NFS文件系统**
 
 ```
 #以下命令在开发板上运行
@@ -297,6 +310,83 @@ sudo umount /mnt
 ```
 
 使用该命令时以要取消挂载的目录作为参数即可，没有输出表示执行正常。如果 在当前挂载的目录进行umount操作，会提示“device is busy”。建议取消挂 载时，先切换到家目录“~”，在进行umount操作。
+
+### 永久挂载
+
+### 1. **编辑 `/etc/fstab` 文件**
+
+使用文本编辑器（如 `nano` 或 `vim`）打开 `/etc/fstab` 文件：
+
+```
+Bash
+sudo nano /etc/fstab
+```
+
+### 2. **添加 NFS 挂载条目**
+
+在 `/etc/fstab` 文件中添加一行，定义 NFS 文件系统的挂载信息。格式如下：
+
+```
+ <NFS服务器地址>:<NFS共享目录> <本地挂载点> nfs <挂载选项> 0 0
+```
+
+例如，如果你想将 `192.168.0.219:/home/embedfire/workdir` 永久挂载到 `/mnt`，可以添加以下内容：
+
+```
+ 192.168.0.219:/home/embedfire/workdir /mnt nfs defaults 0 0
+```
+
+### 3. **挂载选项说明**
+
+- `nfs`：文件系统类型，表示 NFS 文件系统。
+- `defaults`：默认挂载选项，包括 `rw`（读写）、`suid`（允许 SUID）、`dev`（允许设备文件）、`exec`（允许执行文件）、`auto`（自动挂载）、`nouser`（禁止普通用户挂载）、`async`（异步 I/O）。
+- `0 0`：dump 和 fsck 选项，通常设置为 `0 0`。
+
+### 4. **保存并退出编辑器**
+
+保存文件并退出编辑器（在 `nano` 中按 `Ctrl+O` 保存，按 `Ctrl+X` 退出）。
+
+### 5. **测试挂载**
+
+在修改 `/etc/fstab` 后，可以使用以下命令测试挂载是否成功：
+
+```
+Bash
+
+sudo mount -a
+```
+
+该命令会挂载 `/etc/fstab` 中定义的所有文件系统。如果没有报错，说明挂载成功。
+
+### 6. **重启系统**
+
+野火的imx6u debian测试不重启也行
+
+重启系统，验证 NFS 文件系统是否自动挂载：
+
+```
+Bash
+sudo reboot
+```
+
+重启后，检查挂载点是否已挂载：
+
+```
+Bash
+
+df -h
+```
+
+## 可能不成功的原因：		
+
+### 权限不够
+
+```
+mount.nfs: access denied by server while mounting 192.168.100.247:/home/ubuntu18/Desktop/mnt
+
+```
+
+/etc/exports文件夹中没有添加访问权限
 
 # 一些命令
 
