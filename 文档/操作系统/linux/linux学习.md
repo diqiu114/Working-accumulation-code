@@ -390,6 +390,43 @@ mount.nfs: access denied by server while mounting 192.168.100.247:/home/ubuntu18
 
 # 一些命令
 
+## ls
+
+### -l
+
+输出的内容为，eg：
+
+```
+-rw-r--r-- 1 alice developers 4096 Mar 30 10:00 example.txt
+```
+
+- **所有者**：`alice`
+- **所属组**：`developers`
+
+`ls -l` 输出的第一项由 **10 个字符**组成，例如：
+
+```
+drwxr-xr-x
+```
+
+它的涵义如下：
+
+1. **第 1 位**：文件类型
+
+- `d`：目录
+- `-`：普通文件
+- `l`：符号链接（软链接）
+- `b`/`c`：块设备/字符设备文件
+- `s`/`p`：套接字/管道文件
+
+1. **第 2-4 位**：所有者（User）权限
+
+2. **第 5-7 位**：所属组（Group）权限
+3. **第 8-10 位**：其他用户（Others）权限
+4. 第
+
+每组的权限字符由 `r`（读）、`w`（写）、`x`（执行）组成，未赋予权限时用 `-` 表示 
+
 ## chmod
 
 `chmod` 是 Linux/Unix 系统中用于修改文件或目录权限的核心命令，其名称源自 "change mode"。通过权限管理，可控制不同用户对资源的访问级别，从而保障系统安全。以下是 `chmod` 的详细用法及关键知识点：
@@ -488,6 +525,14 @@ chmod go=rx dir/        # 组和其他用户设为读+执行
 
 ```
 
+```
+
+## chown
+
+将文件所有者改为 `bob`
+
+```
+sudo chown bob myfile.txt
 ```
 
 ## source
@@ -1785,11 +1830,121 @@ Dynamic section 中：NEEDED项目会说明需要的链接库：
 Shared library: [xxx]
 ```
 
+# linux驱动开发
 
+## 主次设备号
 
+**驱动与设备的解耦**
 
+- **驱动复用**：同一驱动可服务多个设备实例（如多个U盘共用USB存储驱动，主设备号相同，次设备号不同）。
 
-# pinctrl子系统
+## 字符设备
+
+### register_chrdev
+
+`register_chrdev` 是 Linux 内核中用于注册字符设备驱动的函数，其核心作用是为字符设备分配主设备号并将其操作函数（`file_operations`）关联到内核中，从而使用户空间程序能够通过设备文件与硬件设备交互。以下是其具体作用及实现机制的详细分析：
+
+#### 一、核心功能
+
+1. **设备号与驱动关联** `register_chrdev` 的主要功能是向内核注册一个字符设备，使其主设备号与用户定义的 `file_operations` 结构体绑定。当用户程序通过 `open`、`read`、`write` 等系统调用访问设备文件时，内核会根据主设备号找到对应的驱动操作函数
+2. **动态或静态分配主设备号**
+   - **静态分配**：若指定非零的主设备号（如 `major=240`），则直接使用该主设备号。
+   - **动态分配**：若 `major=0`，内核会自动分配一个未使用的主设备号
+3. **次设备号管理** 该函数默认会将主设备号下的 **0~255 次设备号全部占用**，即使实际仅需少量次设备号，这可能导致资源浪费。因此在新内核中，逐渐被更灵活的 `alloc_chrdev_region` 和 `register_chrdev_region` 取代 
+
+#### 二、实现机制
+
+1. **内核数据结构操作**
+
+   - 调用 
+
+     ```
+     __register_chrdev_region
+     ```
+
+      函数，向内核的字符设备表（
+
+     ```
+     chrdevs
+     ```
+
+      哈希数组）注册设备号范围，并分配 
+
+     ```
+     char_device_struct
+     ```
+
+      结构体 
+
+   - 分配并初始化 `cdev` 结构体，将 `file_operations` 函数指针存入 `cdev->ops` 中
+
+     **设备注册流程**
+
+     - 通过 `cdev_add` 将 `cdev` 结构体添加到内核的字符设备列表中，使设备操作函数对用户可见。
+     - 最终在 `/proc/devices` 中显示设备名称及主设备号
+
+#### 三、典型应用场景
+
+1. 简单字符设备驱动
+
+   适用于快速开发原型或小型设备驱动，代码示例如下：
+
+   ```
+   Cstatic struct file_operations fops = {
+       .owner = THIS_MODULE,
+       .open = my_open,
+       .read = my_read,
+       .write = my_write,
+   };
+   
+   int major = register_chrdev(0, "mydev", &fops); // 动态分配主设备号
+   ```
+
+   加载驱动后需手动创建设备节点：
+
+   ```
+   Bashmknod /dev/mydev c 240 0  # 假设 major=240
+   ``` [71](@ref) [118](@ref)
+   ```
+
+2. 兼容性支持
+
+   在旧版内核（如 2.4 及更早）中广泛使用，新版内核（如 2.6+）虽保留兼容性，但推荐拆分使用 
+
+   ```
+   cdev_init
+   ```
+
+   ```
+   cdev_add
+   ```
+
+    组合以提升灵活性 
+
+#### 四、局限性及替代方案
+
+1. **缺点**
+
+   - 资源浪费：强制占用 256 个次设备号，导致冗余
+   - **灵活性不足**：无法精细控制次设备号范围，需手动管理多个设备实例。
+
+2. **替代方案** 新内核推荐使用以下函数组合：
+
+   - `alloc_chrdev_region`：动态分配设备号。
+
+   - `cdev_init` + `cdev_add`：初始化并注册 `cdev` 结构体。
+
+   - 示例：
+
+     ```
+     Cdev_t devid;
+     alloc_chrdev_region(&devid, 0, 2, "mydev"); // 分配主设备号及 2 个次设备号
+     cdev_init(&my_cdev, &fops);
+     cdev_add(&my_cdev, devid, 2);
+     ``` [93](@ref) [125](@ref)
+     ```
+
+## pinctrl子系统
 
 几个查bug技巧，gpio子系统提示找不到设备：-2 检查pinctrl是否没有错误
 
@@ -1837,6 +1992,6 @@ myled {
     led_gpio = gpiod_get(&pdev->dev, "my_led", 0);
 ```
 
-# linux对中断的处理
+## linux对中断的处理
 
 arm crotx系列单片机中断由nvic处理，硬件支持功能多，软件简单些；linux中就是硬件中断简单，只触发下中断，其他基本上都有软件处理了
