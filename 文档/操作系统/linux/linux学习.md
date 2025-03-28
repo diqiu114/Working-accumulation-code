@@ -1958,11 +1958,13 @@ dmesg | grep pinctrl
 gpioinfo
 ```
 
+pinctrl分为：
 
+controller和client，一般client有固定格式，controller每个厂家毫无统一格式
 
 只管理pin脚（这个点还不是很明白）通常是配合gpio等其他子系统使用
 
-添加pinctrl信息，在iomuxc节点下添加（这里MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03中有snv所以是iomuxc_snvs节点 没有就是iomuxc节点）：
+添加pinctrl信息，在iomuxc节点下添加（这里MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03中有snv所以是iomuxc_snvs节点 没有就是iomuxc节点），controller：
 
 ```
 &iomuxc_snvs {
@@ -1974,7 +1976,7 @@ MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03 0x000110A0
 };
 ```
 
-设备节点信息，给gpio子系统用
+设备节点信息，给gpio子系统用，client：
 
 ```
 myled {
@@ -1991,6 +1993,8 @@ myled {
 /* 4.1 设备树中定义有: led-gpios=<...>;	*/
     led_gpio = gpiod_get(&pdev->dev, "my_led", 0);
 ```
+
+### 注意：
 
 ## linux对中断的处理
 
