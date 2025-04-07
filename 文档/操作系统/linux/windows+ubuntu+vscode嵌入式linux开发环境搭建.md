@@ -36,6 +36,12 @@ bash
 sudo add-apt-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main"
 ```
 
+如果想直接安装默认的
+
+```
+sudo add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main"
+```
+
 更新软件包列表后，您就可以安装更新版本的`clangd`了。例如，安装`clangd-12`：
 
 ```
