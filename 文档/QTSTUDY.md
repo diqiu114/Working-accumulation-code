@@ -112,3 +112,207 @@ connect(pBnt, &QPushButton::clicked, [=]() {
 ```
 
 总结：信号和槽：去网上找。。。。。 
+
+
+
+
+
+# qml
+
+### 图形位置应用
+
+```
+import QtQuick
+import QtQuick.Window
+import QtQuick.Shapes
+import QtQuick.Controls
+
+Window {
+    width: 640
+    height: 480
+    visible: true
+    title: qsTr("Hello World")
+
+    Rectangle {
+        width: 100
+        height: 100
+        color: "#123212"
+        x:120
+        y:100
+        z:101
+    }
+    Rectangle {
+        width: 100
+        height: 100
+        color: "#456434"
+        x:100
+        y:100
+        z:102
+        clip: true  // 裁剪，子对象超出父对象的部分不显示
+        Rectangle {
+            width: 100
+            height: 100
+            color: "yellow"
+            x:50
+            y:50
+            z:102
+        }
+    }
+
+}
+```
+
+### 锚布局
+
+```
+import QtQuick
+import QtQuick.Window
+
+Window {
+    width: 640
+    height: 480
+    visible: true
+    title: qsTr("Hello World")
+
+    Rectangle {
+        id: main
+        width: 100
+        height: 100
+        color: "#123212"
+        x:100
+        y:100
+        z:101
+    }
+    Rectangle {
+        width: 100
+        height: 100
+        color: "#456434"
+        y:100
+        z:102
+        anchors.right:main.left // 锚布局，此控件的右边对齐某id的左边
+    }
+
+}
+
+```
+
+
+
+## Shape —— 渲染容器
+
+这种渲染器，类似矢量图的概念，矢量图的渲染都是计算出来的（贝塞尔曲线），类比qt中的渲染，也需要去描述图形绘画的公式，然后qt中还加上了分层，那么，每层就有每层负责的东西，详细如下：
+
+`Shape` 相当于 **画布 + GPU 渲染器**。
+
+职责：
+
+- 管理绘制
+- 提供尺寸
+- 决定使用哪个 renderer
+- 把路径交给 GPU 画出来
+
+例子：
+
+```
+Shape {
+    width: 200
+    height: 200
+}
+```
+
+它本身 **不描述形状**。
+
+### ShapePath —— 路径样式
+
+`ShapePath` 定义 **路径的绘制方式**：
+
+- 填充
+- 描边
+- 线宽
+- join / cap
+
+例如：
+
+```
+ShapePath {
+    fillColor: "green"
+    strokeColor: "black"
+    strokeWidth: 2
+}
+```
+
+它相当于 **画笔 + 画刷**。
+
+### PathXXX —— 路径几何
+
+`PathRectangle`、`PathLine`、`PathArc` 等只负责：
+
+**定义几何路径**
+
+例如：
+
+```
+PathRectangle {
+    width: 200
+    height: 100
+}
+```
+
+它相当于：
+
+> “在路径里加一个矩形”。
+
+### 示例代码
+
+渲染+变量
+
+```
+import QtQuick
+import QtQuick.Window
+import QtQuick.Shapes
+import QtQuick.Controls
+
+Window {
+    width: 640
+    height: 480
+    visible: true
+    title: qsTr("Hello World")
+
+    Shape {
+        id: rectangleShape
+        width: 200
+        height: 150
+        anchors.centerIn: parent
+        preferredRendererType: Shape.CurveRenderer
+        property color rectColor: "#3ad23c"
+
+
+        ShapePath {
+            fillColor: rectangleShape.rectColor
+
+            PathRectangle {
+                width: rectangleShape.width
+                height: rectangleShape.height
+                topLeftRadius: 30
+                bottomRightRadius: 30
+                bevel: true
+                Component.onCompleted: {
+                    console.log("sdfslkdfjlsf")
+                }
+            }
+        }
+    }
+
+    Button {
+        text: "Ok"
+        width: 100
+        height: 100 
+        onClicked: {
+            rectangleShape.rectColor = "#ff00ff"
+        }
+
+    }
+
+}
+```
+

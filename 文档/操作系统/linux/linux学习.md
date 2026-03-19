@@ -114,7 +114,7 @@ ping通，证明连接没有问题
 使用
 
 ```
-sudo apt-get install openssh-server
+sudo apt-get install openssh-server -y
 ```
 
 有时这里会提示依赖问题，比如
@@ -1998,4 +1998,4 @@ myled {
 
 ## linux对中断的处理
 
-arm crotx系列单片机中断由nvic处理，硬件支持功能多，软件简单些；linux中就是硬件中断简单，只触发下中断，其他基本上都有软件处理了
+arm crotx系列单片机中断由nvic处理，硬件支持功能多，软件简单些；linux中就是硬件中断简单，只触发下中断，其他基本上都有软件处理了	
