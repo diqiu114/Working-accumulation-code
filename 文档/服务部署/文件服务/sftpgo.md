@@ -1200,3 +1200,21 @@
    ```
 
    
+
+## 问题
+
+1. 网页不能在线预览
+
+   输入
+
+   ```
+   chrome://settings/content/pdfDocuments
+   ```
+
+   选择
+
+   ```
+   在 Chrome 中打开 PDF 文件
+   ```
+
+   
